@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="kombai-design-canvas" content="true">
+
+
+
+    <script src="https://unpkg.com/@tailwindcss/browser@4.3.3/dist/index.global.js"
+        integrity="sha384-2ql948lIdLcGEE0/qxNiudyTjgauA3RDJERu5xW75kFCvSl5a9odyQYCb6tEjnmB"
+        crossorigin="anonymous"></script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #root {
+            display: contents;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap');
+
+            :root {
+                --color-dark: #2A2A29;
+                --color-orange: #FF6636;
+                --color-gray: #F2F4F8;
+                --color-white: #FFFFFF;
+            }
+
+            body {
+                background-color: var(--color-dark);
+                color: var(--color-white);
+                font-family: 'Source+Sans+3', sans-serif;
+                overflow-x: clip;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            .font-heading {
+                font-family: 'Bricolage Grotesque', sans-serif;
+            }
+
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+
+            .no-scrollbar {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+
+            .noise-bg::after {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3FfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+                opacity: 0.04;
+                z-index: 9999;
+            }
+
+            .brutalist-border {
+                border: 2px solid var(--color-white);
+            }
+
+            .parallax-item {
+                will-change: transform;
+            }
+        </style>
+        <link data-kid="1" data-name="smooth scroll stylesheet" href="https://unpkg.com/lenis@1/dist/lenis.css"
+            rel="stylesheet" />
+        <div class="noise-bg min-h-screen" data-kid="2" data-name="main page layout container">
+            <!-- Sticky Header -->
+            <header
+                class="fixed top-0 left-0 w-full z-[100] border-b-2 border-white/10 bg-[#2A2A29]/80 backdrop-blur-md"
+                data-kid="2-1" data-name="sticky navigation header">
+                <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between" data-kid="2-1-1"
+                    data-name="navigation bar container">
+                    <div class="flex items-center gap-2" data-kid="2-1-1-1" data-name="brand logo container">
+                        <span class="text-[#FF6636] font-black text-2xl tracking-tighter" data-kid="2-1-1-1-1"
+                            data-name="brand logo text">
+                            DS-GRAPHIX
+                        </span>
+                    </div>
+                    <nav class="hidden md:flex items-center gap-10" data-kid="2-1-1-2"
+                        data-name="navigation links list">
+                        <a class="font-bold uppercase text-sm tracking-widest hover:text-[#FF6636] transition-colors"
+                            data-kid="2-1-1-2-1" data-name="work navigation link" href="#">
+                            Work
+                        </a>
+                        <a class="font-bold uppercase text-sm tracking-widest hover:text-[#FF6636] transition-colors"
+                            data-kid="2-1-1-2-2" data-name="services navigation link" href="#">
+                            Services
+                        </a>
+                        <a class="font-bold uppercase text-sm tracking-widest hover:text-[#FF6636] transition-colors"
+                            data-kid="2-1-1-2-3" data-name="agency navigation link" href="#">
+                            Agency
+                        </a>
+                        <a class="font-bold uppercase text-sm tracking-widest hover:text-[#FF6636] transition-colors"
+                            data-kid="2-1-1-2-4" data-name="contact navigation link" href="#">
+                            Contact
+                        </a>
+                    </nav>
+                    <div class="flex items-center gap-6" data-kid="2-1-1-3"
+                        data-name="header right-side actions container">
+                        <button
+                            class="flex items-center gap-2 text-white/40 hover:text-[#FF6636] transition-colors border-l border-white/10 pl-6 h-full py-4"
+                            data-kid="2-1-1-3-1" data-name="discovery search button">
+                            <svg class="w-4 h-4" data-kid="2-1-1-3-1-1" data-name="magnifying glass icon" fill="none"
+                                stroke="currentColor" viewbox="0 0 24 24">
+                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round"
+                                    stroke-linejoin="round" stroke-width="2.5">
+                                </path>
+                            </svg>
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] hidden sm:inline"
+                                data-kid="2-1-1-3-1-2" data-name="discovery search label text">
+                                Discovery
+                            </span>
+                        </button>
+                        <a class="bg-[#FF6636] text-black px-6 py-2 font-black uppercase text-xs tracking-widest hover:bg-white transition-colors border-2 border-[#FF6636]"
+                            data-kid="2-1-1-3-2" data-name="start project call-to-action button" href="#">
+                            Start Project
+                        </a>
+                    </div>
+                </div>
+            </header>
+            <main class="pt-32" data-kid="2-2" data-name="main content area">
+                <!-- Hero Section -->
+                <section class="max-w-[1440px] mx-auto px-6 py-20 relative overflow-hidden" data-kid="2-2-1"
+                    data-name="hero section container">
+                    <div class="relative z-10" data-kid="2-2-1-1" data-name="hero text content wrapper">
+                        <h1 class="text-[clamp(4rem,12vw,12rem)] font-black uppercase leading-[0.85] tracking-tighter"
+                            data-kid="2-2-1-1-1" data-name="hero headline text" id="hero-text">
+                            Proof, in
+                            <br data-kid="2-2-1-1-1-1" data-name="headline line break" />
+                            <span class="text-[#FF6636]" data-kid="2-2-1-1-1-2" data-name="hero headline accent text">
+                                the work.
+                            </span>
+                        </h1>
+                        <div class="mt-12 flex flex-col sm:flex-row sm:items-end gap-6 sm:gap-12" data-kid="2-2-1-1-2"
+                            data-name="hero stats and description wrapper" id="hero-count">
+                            <div class="flex items-end gap-4" data-kid="2-2-1-1-2-1"
+                                data-name="hero stat counter container">
+                                <span class="text-8xl sm:text-[12rem] font-black leading-none text-[#FF6636]"
+                                    data-kid="2-2-1-1-2-1-1" data-name="hero stat number text">
+                                    48
+                                </span>
+                                <div class="mb-4 sm:mb-8" data-kid="2-2-1-1-2-1-2"
+                                    data-name="hero stat label container">
+                                    <span class="block text-xl sm:text-3xl font-black uppercase leading-tight"
+                                        data-kid="2-2-1-1-2-1-2-1" data-name="hero stat description text">
+                                        Launches
+                                        <br data-kid="2-2-1-1-2-1-2-1-1" data-name="stat description line break" />
+                                        Executed
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="max-w-md text-white/50 text-lg sm:text-xl font-medium mb-4 sm:mb-8 leading-relaxed"
+                                data-kid="2-2-1-1-2-2" data-name="hero descriptive paragraph">
+                                From architecture to algorithms. We build digital ecosystems that don't just look
+                                pretty—they dominate.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+                <!-- Filter Chips -->
+                <section class="max-w-[1440px] mx-auto px-6 mb-40" data-kid="2-2-2"
+                    data-name="work filter chips section">
+                    <div class="flex gap-4 overflow-x-auto pb-6 no-scrollbar" data-kid="2-2-2-1"
+                        data-name="filter chips list container" id="filters">
+                        <button
+                            class="px-10 py-4 bg-[#FF6636] text-black font-black uppercase shrink-0 brutalist-border border-white tracking-widest text-xs"
+                            data-kid="2-2-2-1-1" data-name="all work filter button">
+                            All Work
+                        </button>
+                        <button
+                            class="px-10 py-4 brutalist-border border-white/20 text-white/40 font-black uppercase shrink-0 transition-all hover:border-white hover:text-white text-xs tracking-widest"
+                            data-kid="2-2-2-1-2" data-name="ui/ux filter button">
+                            UI/UX
+                        </button>
+                        <button
+                            class="px-10 py-4 brutalist-border border-white/20 text-white/40 font-black uppercase shrink-0 transition-all hover:border-white hover:text-white text-xs tracking-widest"
+                            data-kid="2-2-2-1-3" data-name="branding filter button">
+                            Branding
+                        </button>
+                        <button
+                            class="px-10 py-4 brutalist-border border-white/20 text-white/40 font-black uppercase shrink-0 transition-all hover:border-white hover:text-white text-xs tracking-widest"
+                            data-kid="2-2-2-1-4" data-name="graphics filter button">
+                            Graphics
+                        </button>
+                        <button
+                            class="px-10 py-4 brutalist-border border-white/20 text-white/40 font-black uppercase shrink-0 transition-all hover:border-white hover:text-white text-xs tracking-widest"
+                            data-kid="2-2-2-1-5" data-name="social filter button">
+                            Social
+                        </button>
+                        <button
+                            class="px-10 py-4 brutalist-border border-white/20 text-white/40 font-black uppercase shrink-0 transition-all hover:border-white hover:text-white text-xs tracking-widest"
+                            data-kid="2-2-2-1-6" data-name="video filter button">
+                            Video
+                        </button>
+                    </div>
+                </section>
+                <!-- Collage Section -->
+                <section class="relative min-h-[140vh] px-6 py-20" data-kid="2-2-3"
+                    data-name="portfolio collage section" id="collage-container">
+                    <div class="max-w-[1440px] mx-auto relative h-full flex flex-col gap-24 lg:block" data-kid="2-2-3-1"
+                        data-name="collage items container">
+                        <!-- Frame 1: Editorial Architecture -->
+                        <div class="collage-item parallax-item lg:absolute top-0 left-0 w-full lg:w-[46%] brutalist-border bg-[#2A2A29] z-10 rotate-[-2deg] group"
+                            data-kid="2-2-3-1-1" data-name="editorial architecture card" data-speed="0.1">
+                            <img alt="Architecture Editorial"
+                                class="w-full aspect-[16/10] object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                data-kid="2-2-3-1-1-1" data-name="editorial architecture project image" decoding="async"
+                                loading="lazy"
+                                src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&w=1200&q=80&fit=crop" />
+                            <div class="p-8" data-kid="2-2-3-1-1-2"
+                                data-name="editorial architecture card content wrapper">
+                                <div class="flex justify-between items-start mb-6" data-kid="2-2-3-1-1-2-1"
+                                    data-name="editorial architecture header wrapper">
+                                    <div data-kid="2-2-3-1-1-2-1-1"
+                                        data-name="editorial architecture category and title wrapper">
+                                        <span class="text-[#FF6636] font-black uppercase text-xs tracking-widest"
+                                            data-kid="2-2-3-1-1-2-1-1-1"
+                                            data-name="editorial architecture category label">
+                                            Editorial / Architecture
+                                        </span>
+                                        <h3 class="text-4xl font-black uppercase mt-2" data-kid="2-2-3-1-1-2-1-1-2"
+                                            data-name="editorial architecture project title">
+                                            Skyline Nexus
+                                        </h3>
+                                    </div>
+                                    <div class="w-12 h-12 brutalist-border flex items-center justify-center group-hover:bg-[#FF6636] transition-colors"
+                                        data-kid="2-2-3-1-1-2-1-2" data-name="editorial architecture arrow button">
+                                        <svg class="w-6 h-6 group-hover:text-black" data-kid="2-2-3-1-1-2-1-2-1"
+                                            data-name="arrow icon" fill="none" stroke="currentColor"
+                                            viewbox="0 0 24 24">
+                                            <path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round"
+                                                stroke-linejoin="round" stroke-width="2">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="bg-[#FF6636]/10 p-4 border-l-4 border-[#FF6636] flex justify-between items-center"
+                                    data-kid="2-2-3-1-1-2-2" data-name="editorial architecture result badge">
+                                    <span class="text-white/60 font-bold uppercase text-xs tracking-tighter"
+                                        data-kid="2-2-3-1-1-2-2-1" data-name="editorial architecture result label">
+                                        Measurable Result
+                                    </span>
+                                    <span class="text-[#FF6636] font-black text-xl" data-kid="2-2-3-1-1-2-2-2"
+                                        data-name="editorial architecture result value">
+                                        +120% Equity
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Frame 2: Dashboard -->
+                        <div class="collage-item parallax-item lg:absolute top-[5%] right-0 w-full lg:w-[44%] brutalist-border bg-[#2A2A29] z-20 rotate-[3deg] group"
+                            data-kid="2-2-3-1-2" data-name="dashboard project card" data-speed="0.3">
+                            <img alt="Data Dashboard"
+                                class="w-full aspect-video object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                data-kid="2-2-3-1-2-1" data-name="dashboard project image" decoding="async"
+                                loading="lazy"
+                                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&w=800&q=80&fit=crop" />
+                            <div class="p-8" data-kid="2-2-3-1-2-2" data-name="dashboard card content wrapper">
+                                <div class="flex justify-between items-start mb-6" data-kid="2-2-3-1-2-2-1"
+                                    data-name="dashboard header wrapper">
+                                    <div data-kid="2-2-3-1-2-2-1-1" data-name="dashboard category and title wrapper">
+                                        <span class="text-[#FF6636] font-black uppercase text-xs tracking-widest"
+                                            data-kid="2-2-3-1-2-2-1-1-1" data-name="dashboard category label">
+                                            UI/UX / Dashboard
+                                        </span>
+                                        <h3 class="text-4xl font-black uppercase mt-2" data-kid="2-2-3-1-2-2-1-1-2"
+                                            data-name="dashboard project title">
+                                            Vortex Flow
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="bg-[#FF6636]/10 p-4 border-l-4 border-[#FF6636] flex justify-between items-center"
+                                    data-kid="2-2-3-1-2-2-2" data-name="dashboard result badge">
+                                    <span class="text-white/60 font-bold uppercase text-xs tracking-tighter"
+                                        data-kid="2-2-3-1-2-2-2-1" data-name="dashboard result label">
+                                        Measurable Result
+                                    </span>
+                                    <span class="text-[#FF6636] font-black text-xl" data-kid="2-2-3-1-2-2-2-2"
+                                        data-name="dashboard result value">
+                                        4.8s Task Time
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Frame 3: Packaging (Portrait) -->
+                        <div class="collage-item parallax-item lg:absolute top-[35%] left-[2%] w-full lg:w-[28%] brutalist-border bg-[#2A2A29] z-30 rotate-[-3deg] group"
+                            data-kid="2-2-3-1-3" data-name="packaging project card" data-speed="0.6">
+                            <img alt="Product Packaging"
+                                class="w-full aspect-[3/4] object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                data-kid="2-2-3-1-3-1" data-name="packaging project image" decoding="async"
+                                loading="lazy"
+                                src="https://images.unsplash.com/photo-1589118949245-7d38baf380d6?auto=format&w=800&q=80&fit=crop" />
+                            <div class="p-8" data-kid="2-2-3-1-3-2" data-name="packaging card content wrapper">
+                                <span class="text-[#FF6636] font-black uppercase text-xs tracking-widest"
+                                    data-kid="2-2-3-1-3-2-1" data-name="packaging category label">
+                                    Packaging / Brand
+                                </span>
+                                <h3 class="text-3xl font-black uppercase mt-2" data-kid="2-2-3-1-3-2-2"
+                                    data-name="packaging project title">
+                                    Origin Zero
+                                </h3>
+                                <div class="mt-6 pt-6 border-t border-white/10 flex justify-between items-center"
+                                    data-kid="2-2-3-1-3-2-3" data-name="packaging result badge">
+                                    <span class="text-white/40 font-bold uppercase text-xs" data-kid="2-2-3-1-3-2-3-1"
+                                        data-name="packaging result label">
+                                        Measurable Result
+                                    </span>
+                                    <span class="text-[#FF6636] font-black text-lg" data-kid="2-2-3-1-3-2-3-2"
+                                        data-name="packaging result value">
+                                        95% Recyclable
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Frame 4: Reel (Video) -->
+                        <div class="collage-item parallax-item lg:absolute top-[48%] right-[4%] w-full lg:w-[38%] brutalist-border bg-[#2A2A29] z-40 rotate-[2deg] group"
+                            data-kid="2-2-3-1-4" data-name="reel project card" data-speed="0.2">
+                            <div class="relative aspect-video overflow-hidden" data-kid="2-2-3-1-4-1"
+                                data-name="reel project video container">
+                                <video autoplay=""
+                                    class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                    data-kid="2-2-3-1-4-1-1" data-name="reel project video" loop="" muted=""
+                                    playsinline=""
+                                    poster="https://images.pexels.com/videos/15439663/3d-cgi-clip-dj-15439663.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=630&w=1200"
+                                    preload="metadata"
+                                    src="https://videos.pexels.com/video-files/15439663/15439663-sd_426_240_30fps.mp4">
+                                </video>
+                                <div class="absolute top-6 left-6 bg-[#FF6636] text-black px-4 py-1 font-black uppercase text-xs"
+                                    data-kid="2-2-3-1-4-1-2" data-name="reel project category badge">
+                                    Video Reel
+                                </div>
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/40 transition-opacity"
+                                    data-kid="2-2-3-1-4-1-3" data-name="reel play button overlay">
+                                    <div class="w-20 h-20 brutalist-border flex items-center justify-center opacity-70 group-hover:opacity-100 transition-opacity scale-75 lg:scale-100"
+                                        data-kid="2-2-3-1-4-1-3-1" data-name="reel play icon container">
+                                        <svg class="w-8 h-8 fill-white" data-kid="2-2-3-1-4-1-3-1-1"
+                                            data-name="play icon" viewbox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-8" data-kid="2-2-3-1-4-2" data-name="reel card content wrapper">
+                                <h3 class="text-3xl font-black uppercase" data-kid="2-2-3-1-4-2-1"
+                                    data-name="reel project title">
+                                    Motion Archetype
+                                </h3>
+                                <div class="mt-4 bg-[#FF6636]/10 p-4 border-l-4 border-[#FF6636] flex justify-between items-center"
+                                    data-kid="2-2-3-1-4-2-2" data-name="reel result badge">
+                                    <span class="text-white/60 font-bold uppercase text-xs tracking-tighter"
+                                        data-kid="2-2-3-1-4-2-2-1" data-name="reel result label">
+                                        Impact
+                                    </span>
+                                    <span class="text-[#FF6636] font-black text-xl" data-kid="2-2-3-1-4-2-2-2"
+                                        data-name="reel result value">
+                                        2.4M Impressions
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Frame 5: Social Artwork -->
+                        <div class="collage-item parallax-item lg:absolute top-[75%] left-[32%] w-full lg:w-[30%] brutalist-border bg-[#2A2A29] z-10 rotate-[4deg] group"
+                            data-kid="2-2-3-1-5" data-name="social artwork project card" data-speed="0.9">
+                            <img alt="Social Artwork"
+                                class="w-full aspect-square object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                data-kid="2-2-3-1-5-1" data-name="social artwork project image" decoding="async"
+                                loading="lazy"
+                                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&w=800&q=80&fit=crop" />
+                            <div class="p-8" data-kid="2-2-3-1-5-2" data-name="social card content wrapper">
+                                <span class="text-[#FF6636] font-black uppercase text-xs tracking-widest"
+                                    data-kid="2-2-3-1-5-2-1" data-name="social category label">
+                                    Social / Content
+                                </span>
+                                <h3 class="text-3xl font-black uppercase mt-2" data-kid="2-2-3-1-5-2-2"
+                                    data-name="social project title">
+                                    Abstract Pulse
+                                </h3>
+                                <div class="mt-6 pt-6 border-t border-white/10 flex justify-between items-center"
+                                    data-kid="2-2-3-1-5-2-3" data-name="social result badge">
+                                    <span class="text-white/40 font-bold uppercase text-xs" data-kid="2-2-3-1-5-2-3-1"
+                                        data-name="social result label">
+                                        Engagement
+                                    </span>
+                                    <span class="text-[#FF6636] font-black text-lg" data-kid="2-2-3-1-5-2-3-2"
+                                        data-name="social result value">
+                                        +85% Growth
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Frame 6: Branding/Identity -->
+                        <div class="collage-item parallax-item lg:absolute top-[90%] right-[2%] w-full lg:w-[42%] brutalist-border bg-[#2A2A29] z-20 rotate-[-2deg] group"
+                            data-kid="2-2-3-1-6" data-name="branding project card" data-speed="0.4">
+                            <img alt="Brand Identity"
+                                class="w-full aspect-[4/3] object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                data-kid="2-2-3-1-6-1" data-name="branding project image" decoding="async"
+                                loading="lazy"
+                                src="https://images.unsplash.com/photo-1572044162444-ad60f128bde7?auto=format&w=800&q=80&fit=crop" />
+                            <div class="p-8" data-kid="2-2-3-1-6-2" data-name="branding card content wrapper">
+                                <div class="flex justify-between items-start mb-6" data-kid="2-2-3-1-6-2-1"
+                                    data-name="branding header wrapper">
+                                    <div data-kid="2-2-3-1-6-2-1-1" data-name="branding category and title wrapper">
+                                        <span class="text-[#FF6636] font-black uppercase text-xs tracking-widest"
+                                            data-kid="2-2-3-1-6-2-1-1-1" data-name="branding category label">
+                                            Identity / Strategy
+                                        </span>
+                                        <h3 class="text-4xl font-black uppercase mt-2" data-kid="2-2-3-1-6-2-1-1-2"
+                                            data-name="branding project title">
+                                            Kinetic Logo
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="pt-6 border-t border-white/10 flex justify-between items-center"
+                                    data-kid="2-2-3-1-6-2-2" data-name="branding result badge">
+                                    <span class="text-white/40 font-bold uppercase text-xs" data-kid="2-2-3-1-6-2-2-1"
+                                        data-name="branding result label">
+                                        Measurable Result
+                                    </span>
+                                    <span class="text-[#FF6636] font-black text-xl" data-kid="2-2-3-1-6-2-2-2"
+                                        data-name="branding result value">
+                                        Top Tier Exit
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Dark Proof Wall -->
+                <section class="bg-black py-40 relative" data-kid="2-2-4" data-name="dark proof wall section">
+                    <div class="max-w-[1440px] mx-auto px-6" data-kid="2-2-4-1" data-name="proof wall content wrapper">
+                        <div class="flex flex-col lg:flex-row gap-20" data-kid="2-2-4-1-1"
+                            data-name="proof wall layout columns">
+                            <!-- Metrics Column -->
+                            <div class="lg:w-1/2" data-kid="2-2-4-1-1-1" data-name="proof wall metrics column">
+                                <h2 class="text-6xl sm:text-8xl font-black uppercase mb-16 tracking-tighter leading-none"
+                                    data-kid="2-2-4-1-1-1-1" data-name="proof wall headline">
+                                    The Proof
+                                    <br data-kid="2-2-4-1-1-1-1-1" data-name="proof wall headline break" />
+                                    Wall.
+                                </h2>
+                                <div class="space-y-4" data-kid="2-2-4-1-1-1-2" data-name="metrics list wrapper">
+                                    <div class="bg-[#FF6636] p-10 brutalist-border flex justify-between items-center group overflow-hidden relative"
+                                        data-kid="2-2-4-1-1-1-2-1" data-name="retention rate metric card">
+                                        <div class="relative z-10" data-kid="2-2-4-1-1-1-2-1-1"
+                                            data-name="retention rate text content">
+                                            <span class="text-black font-black text-7xl sm:text-8xl block leading-none"
+                                                data-kid="2-2-4-1-1-1-2-1-1-1" data-name="retention rate percentage">
+                                                98%
+                                            </span>
+                                            <span class="text-black/80 font-black uppercase tracking-widest block mt-4"
+                                                data-kid="2-2-4-1-1-1-2-1-1-2" data-name="retention rate label">
+                                                Retention rate
+                                            </span>
+                                        </div>
+                                        <div class="absolute right-0 top-0 h-full w-20 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500"
+                                            data-kid="2-2-4-1-1-1-2-1-2" data-name="retention rate decoration bar">
+                                        </div>
+                                    </div>
+                                    <div class="bg-[#FF6636] p-10 brutalist-border flex justify-between items-center group overflow-hidden relative"
+                                        data-kid="2-2-4-1-1-1-2-2" data-name="conversion lift metric card">
+                                        <div class="relative z-10" data-kid="2-2-4-1-1-1-2-2-1"
+                                            data-name="conversion lift text content">
+                                            <span class="text-black font-black text-7xl sm:text-8xl block leading-none"
+                                                data-kid="2-2-4-1-1-1-2-2-1-1" data-name="conversion lift percentage">
+                                                +450%
+                                            </span>
+                                            <span class="text-black/80 font-black uppercase tracking-widest block mt-4"
+                                                data-kid="2-2-4-1-1-1-2-2-1-2" data-name="conversion lift label">
+                                                Conversion lift
+                                            </span>
+                                        </div>
+                                        <div class="absolute right-0 top-0 h-full w-20 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500"
+                                            data-kid="2-2-4-1-1-1-2-2-2" data-name="conversion lift decoration bar">
+                                        </div>
+                                    </div>
+                                    <div class="bg-[#FF6636] p-10 brutalist-border flex justify-between items-center group overflow-hidden relative"
+                                        data-kid="2-2-4-1-1-1-2-3" data-name="awards metric card">
+                                        <div class="relative z-10" data-kid="2-2-4-1-1-1-2-3-1"
+                                            data-name="awards text content">
+                                            <span class="text-black font-black text-7xl sm:text-8xl block leading-none"
+                                                data-kid="2-2-4-1-1-1-2-3-1-1" data-name="awards count">
+                                                12+
+                                            </span>
+                                            <span class="text-black/80 font-black uppercase tracking-widest block mt-4"
+                                                data-kid="2-2-4-1-1-1-2-3-1-2" data-name="awards label">
+                                                Awards 2024
+                                            </span>
+                                        </div>
+                                        <div class="absolute right-0 top-0 h-full w-20 bg-white/20 translate-x-full group-hover:translate-x-0 transition-transform duration-500"
+                                            data-kid="2-2-4-1-1-1-2-3-2" data-name="awards decoration bar">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Testimonials Column -->
+                            <div class="lg:w-1/2 flex flex-col justify-center gap-12" data-kid="2-2-4-1-1-2"
+                                data-name="testimonials column">
+                                <div class="brutalist-border border-white/20 p-12 relative group hover:border-[#FF6636] transition-colors bg-[#FF6636]/5"
+                                    data-kid="2-2-4-1-1-2-1" data-name="testimonial 1 card">
+                                    <div class="absolute -top-4 -left-4 bg-[#FF6636] text-black px-6 py-2 font-black uppercase text-xs tracking-widest"
+                                        data-kid="2-2-4-1-1-2-1-1" data-name="testimonial 1 role badge">
+                                        CEO, NEXGEN SYSTEMS
+                                    </div>
+                                    <p class="text-2xl sm:text-3xl font-medium leading-relaxed italic text-white/90"
+                                        data-kid="2-2-4-1-1-2-1-2" data-name="testimonial 1 quote">
+                                        "DS-Graphix didn't just design a website; they architected a growth engine. The
+                                        collage energy and raw aesthetics fit our brand perfectly. Their process is
+                                        brutal but brilliant."
+                                    </p>
+                                    <div class="mt-8 flex items-center gap-4" data-kid="2-2-4-1-1-2-1-3"
+                                        data-name="testimonial 1 author wrapper">
+                                        <div class="w-12 h-[2px] bg-[#FF6636]" data-kid="2-2-4-1-1-2-1-3-1"
+                                            data-name="testimonial 1 author line decoration">
+                                        </div>
+                                        <p class="font-black uppercase text-xl tracking-widest text-[#FF6636]"
+                                            data-kid="2-2-4-1-1-2-1-3-2" data-name="testimonial 1 author name">
+                                            Sarah Jenkins
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="brutalist-border border-white/20 p-12 relative group hover:border-[#FF6636] transition-colors bg-[#FF6636]/5"
+                                    data-kid="2-2-4-1-1-2-2" data-name="testimonial 2 card">
+                                    <div class="absolute -top-4 -left-4 bg-[#FF6636] text-black px-6 py-2 font-black uppercase text-xs tracking-widest"
+                                        data-kid="2-2-4-1-1-2-2-1" data-name="testimonial 2 role badge">
+                                        PRODUCT HEAD, FLOW UI
+                                    </div>
+                                    <p class="text-2xl sm:text-3xl font-medium leading-relaxed italic text-white/90"
+                                        data-kid="2-2-4-1-1-2-2-2" data-name="testimonial 2 quote">
+                                        "Sharp, brutal, and incredibly effective. Their proof is indeed in the work.
+                                        Best agency experience we've had in a decade. Dhananjay's vision is unmatched."
+                                    </p>
+                                    <div class="mt-8 flex items-center gap-4" data-kid="2-2-4-1-1-2-2-3"
+                                        data-name="testimonial 2 author wrapper">
+                                        <div class="w-12 h-[2px] bg-[#FF6636]" data-kid="2-2-4-1-1-2-2-3-1"
+                                            data-name="testimonial 2 author line decoration">
+                                        </div>
+                                        <p class="font-black uppercase text-xl tracking-widest text-[#FF6636]"
+                                            data-kid="2-2-4-1-1-2-2-3-2" data-name="testimonial 2 author name">
+                                            Dhananjay Chalke
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Footer CTA -->
+                <section class="bg-[#FF6636] py-24 px-6 overflow-hidden group" data-kid="2-2-5"
+                    data-name="footer call-to-action section">
+                    <div class="max-w-[1440px] mx-auto text-center relative z-10" data-kid="2-2-5-1"
+                        data-name="footer call-to-action wrapper">
+                        <h2 class="text-black font-black text-6xl sm:text-[10rem] uppercase leading-[0.8] tracking-[-(0.05em)] mb-12 group-hover:tracking-normal transition-all duration-1000"
+                            data-kid="2-2-5-1-1" data-name="footer cta headline">
+                            Open the
+                            <br data-kid="2-2-5-1-1-1" data-name="footer cta headline break" />
+                            case files
+                        </h2>
+                        <a class="inline-block bg-black text-[#FF6636] px-16 py-6 font-black uppercase text-2xl brutalist-border border-black hover:bg-white hover:text-black transition-all"
+                            data-kid="2-2-5-1-2" data-name="footer cta button" href="#">
+                            Schedule Briefing
+                        </a>
+                    </div>
+                    <!-- Scrolling Ticker for background decoration -->
+                    <div class="mt-20 flex overflow-hidden whitespace-nowrap opacity-10" data-kid="2-2-5-2"
+                        data-name="background scrolling ticker container">
+                        <div class="text-black font-black text-[15rem] uppercase leading-none select-none tracking-tighter animate-scroll"
+                            data-kid="2-2-5-2-1" data-name="scrolling text ticker">
+                            UI/UX • BRANDING • STRATEGY • VIDEO • IDENTITY • UI/UX • BRANDING • STRATEGY • VIDEO •
+                            IDENTITY •
+                        </div>
+                    </div>
+                </section>
+                <!-- Minimal Footer -->
+                <footer class="bg-black py-12 px-6 border-t-2 border-white/5" data-kid="2-2-6"
+                    data-name="minimal site footer">
+                    <div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8"
+                        data-kid="2-2-6-1" data-name="footer layout wrapper">
+                        <div class="text-[#FF6636] font-black text-2xl tracking-tighter uppercase" data-kid="2-2-6-1-1"
+                            data-name="footer brand name">
+                            DS-Graphix
+                        </div>
+                        <div class="flex gap-10" data-kid="2-2-6-1-2" data-name="footer social links list">
+                            <a class="text-white/40 hover:text-white transition-colors font-bold uppercase text-xs tracking-widest"
+                                data-kid="2-2-6-1-2-1" data-name="footer linkedin link" href="#">
+                                LinkedIn
+                            </a>
+                            <a class="text-white/40 hover:text-white transition-colors font-bold uppercase text-xs tracking-widest"
+                                data-kid="2-2-6-1-2-2" data-name="footer behance link" href="#">
+                                Behance
+                            </a>
+                            <a class="text-white/40 hover:text-white transition-colors font-bold uppercase text-xs tracking-widest"
+                                data-kid="2-2-6-1-2-3" data-name="footer instagram link" href="#">
+                                Instagram
+                            </a>
+                            <a class="text-white/40 hover:text-white transition-colors font-bold uppercase text-xs tracking-widest"
+                                data-kid="2-2-6-1-2-4" data-name="footer twitter link" href="#">
+                                Twitter
+                            </a>
+                        </div>
+                        <div class="text-white/20 text-xs font-bold uppercase tracking-widest" data-kid="2-2-6-1-3"
+                            data-name="footer copyright text">
+                            © 2024 DS-Graphix • All Rights Reserved
+                        </div>
+                    </div>
+                </footer>
+            </main>
+            <!-- Sticky WhatsApp Toggle -->
+            <div class="fixed bottom-8 right-8 z-[100]" data-kid="2-3" data-name="whatsapp button container">
+                <a class="w-16 h-16 bg-[#25D366] flex items-center justify-center rounded-none brutalist-border border-white hover:scale-110 transition-transform"
+                    data-kid="2-3-1" data-name="whatsapp contact button" href="#">
+                    <svg class="w-8 h-8 fill-white" data-kid="2-3-1-1" data-name="whatsapp icon" viewbox="0 0 24 24">
+                        <path
+                            d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.438 9.889-9.886.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.89 4.44-9.892 9.886-.001 2.125.593 3.456 1.574 5.111l-.973 3.558 3.585-.939c.168.092.168.092 0 0zM12.006 18.01c-3.3 0-6-2.7-6-6 0-3.3 2.7-6 6-6 3.3 0 6 2.7 6 6 0 3.3-2.7 6-6 6z">
+                        </path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js">
+        </script>
+        <script type="module">
+            import Lenis from "https://esm.sh/lenis@1"
+
+            // Register GSAP plugins
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Initialize Lenis smooth scroll
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smoothWheel: true,
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+            requestAnimationFrame(raf);
+
+            // Hero Entry Animation
+            gsap.from("#hero-text span", {
+                y: 100,
+                opacity: 0,
+                duration: 1.5,
+                ease: "expo.out",
+                delay: 0.5
+            });
+
+            gsap.from("#hero-count", {
+                y: 50,
+                opacity: 0,
+                duration: 1.2,
+                ease: "power3.out",
+                delay: 0.8
+            });
+
+            // Collage Parallax
+            const collageItems = document.querySelectorAll('.parallax-item');
+            collageItems.forEach(item => {
+                const speed = parseFloat(item.getAttribute('data-speed'));
+
+                gsap.fromTo(item,
+                    { y: 0 },
+                    {
+                        y: (speed * 150),
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: item,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: true
+                        }
+                    }
+                );
+            });
+
+            // Fade in cases + hover interaction
+            const cases = document.querySelectorAll('.collage-item');
+            cases.forEach(item => {
+                gsap.from(item, {
+                    scale: 0.98,
+                    opacity: 0,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top 90%",
+                        toggleActions: "play none none reverse"
+                    }
+                });
+
+                item.addEventListener('mouseenter', () => {
+                    gsap.to(item, { scale: 1.02, zIndex: 60, duration: 0.4, ease: "power2.out" });
+                });
+                item.addEventListener('mouseleave', () => {
+                    gsap.to(item, { scale: 1, zIndex: item.classList.contains('z-40') ? 40 : (item.classList.contains('z-30') ? 30 : (item.classList.contains('z-20') ? 20 : 10)), duration: 0.4, ease: "power2.out" });
+                });
+            });
+
+            // Ticker Animation
+            gsap.to(".animate-scroll", {
+                xPercent: -50,
+                repeat: -1,
+                duration: 30,
+                ease: "none"
+            });
+
+            // Metrics entrance
+            gsap.from(".proof-wall-metric", {
+                x: -50,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: ".proof-wall-metric",
+                    start: "top 80%"
+                }
+            });
+        </script>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ds-graphix.com/sitemap.xml
