@@ -6,11 +6,11 @@ if (typeof window !== "undefined") {
 }
 
 export const ANIM = {
-  ease: "power3.out",
-  duration: 0.7,
-  stagger: 0.08,
-  yOffset: 36,
-  hoverDuration: 0.22,
+  ease: "power2.out",
+  duration: 0.6,
+  stagger: 0.06,
+  yOffset: 24,
+  hoverDuration: 0.2,
 };
 
 export function isReducedMotion() {
@@ -19,70 +19,42 @@ export function isReducedMotion() {
 }
 
 /**
- * Split text into masked word spans for rising word entrance animations
+ * Non-destructive, high-performance headline reveal animation
+ * (Does NOT mutate React DOM text nodes, preventing duplicate text bugs)
  */
 export function initSplitHeadline(headlineElement, scrollTriggerOptions = null) {
   if (!headlineElement || isReducedMotion()) return () => {};
 
-  const processNode = (node) => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      const text = node.textContent;
-      if (!text.trim()) return;
-      const words = text.split(/(\s+)/);
-      const fragment = document.createDocumentFragment();
-
-      words.forEach((w) => {
-        if (/^\s+$/.test(w)) {
-          fragment.appendChild(document.createTextNode(w));
-        } else if (w.length > 0) {
-          const outer = document.createElement("span");
-          outer.className = "inline-block overflow-hidden align-top py-0.5 mr-[0.2em]";
-          const inner = document.createElement("span");
-          inner.className = "split-word inline-block transform translate-y-[110%] opacity-0";
-          inner.textContent = w;
-          outer.appendChild(inner);
-          fragment.appendChild(outer);
-        }
-      });
-
-      node.parentNode.replaceChild(fragment, node);
-    } else if (node.nodeType === Node.ELEMENT_NODE && !node.classList.contains("split-word")) {
-      Array.from(node.childNodes).forEach(processNode);
-    }
-  };
-
   const ctx = gsap.context(() => {
-    processNode(headlineElement);
-    const words = headlineElement.querySelectorAll(".split-word");
+    const animConfig = {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: "power3.out",
+    };
 
-    if (words.length > 0) {
-      const animConfig = {
-        y: "0%",
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.035,
-        ease: ANIM.ease,
+    if (scrollTriggerOptions) {
+      animConfig.scrollTrigger = {
+        trigger: headlineElement,
+        start: "top 90%",
+        toggleActions: "play none none none",
+        once: true,
+        ...scrollTriggerOptions,
       };
-
-      if (scrollTriggerOptions) {
-        animConfig.scrollTrigger = {
-          trigger: headlineElement,
-          start: "top 88%",
-          toggleActions: "play none none none",
-          once: true,
-          ...scrollTriggerOptions,
-        };
-      }
-
-      gsap.to(words, animConfig);
     }
+
+    gsap.fromTo(
+      headlineElement,
+      { opacity: 0, y: 20 },
+      animConfig
+    );
   }, headlineElement);
 
   return () => ctx.revert();
 }
 
 /**
- * Item 3: Multi-Layer Parallax scrubbing 3 depth layers at different speeds
+ * Multi-Layer Parallax scrubbing depth layers
  */
 export function initMultiLayerParallax({ container, bgLayer, midLayer, fgLayer }) {
   if (!container || isReducedMotion()) return () => {};
@@ -90,7 +62,7 @@ export function initMultiLayerParallax({ container, bgLayer, midLayer, fgLayer }
   const ctx = gsap.context(() => {
     if (bgLayer) {
       gsap.to(bgLayer, {
-        yPercent: 18,
+        yPercent: 10,
         ease: "none",
         scrollTrigger: {
           trigger: container,
@@ -103,7 +75,7 @@ export function initMultiLayerParallax({ container, bgLayer, midLayer, fgLayer }
 
     if (midLayer) {
       gsap.to(midLayer, {
-        yPercent: -12,
+        yPercent: -8,
         ease: "none",
         scrollTrigger: {
           trigger: container,
@@ -116,7 +88,7 @@ export function initMultiLayerParallax({ container, bgLayer, midLayer, fgLayer }
 
     if (fgLayer) {
       gsap.to(fgLayer, {
-        yPercent: -6,
+        yPercent: -4,
         ease: "none",
         scrollTrigger: {
           trigger: container,
@@ -132,7 +104,7 @@ export function initMultiLayerParallax({ container, bgLayer, midLayer, fgLayer }
 }
 
 /**
- * Item 4: Portfolio & Case Study Image Reveal (Fast smooth scale + color reveal)
+ * Image Reveal Treatment (Smooth hardware-accelerated scale + opacity reveal)
  */
 export function initImageRevealTreatment(containerElement) {
   if (!containerElement || isReducedMotion()) return () => {};
@@ -145,13 +117,13 @@ export function initImageRevealTreatment(containerElement) {
       gsap.fromTo(
         img,
         {
-          scale: 1.06,
-          opacity: 0.85,
+          scale: 1.04,
+          opacity: 0.9,
         },
         {
           scale: 1,
           opacity: 1,
-          duration: 0.6,
+          duration: 0.5,
           ease: "power2.out",
           scrollTrigger: {
             trigger: imgContainer,
@@ -168,21 +140,21 @@ export function initImageRevealTreatment(containerElement) {
 }
 
 /**
- * Item 5: Magnetic Hover Effect on Primary CTA Buttons using GSAP quickTo
+ * Magnetic Hover Effect on Primary CTA Buttons
  */
 export function initMagneticButton(buttonElement) {
   if (!buttonElement || isReducedMotion()) return () => {};
 
-  const xTo = gsap.quickTo(buttonElement, "x", { duration: 0.3, ease: "power3.out" });
-  const yTo = gsap.quickTo(buttonElement, "y", { duration: 0.3, ease: "power3.out" });
+  const xTo = gsap.quickTo(buttonElement, "x", { duration: 0.25, ease: "power2.out" });
+  const yTo = gsap.quickTo(buttonElement, "y", { duration: 0.25, ease: "power2.out" });
 
   const handleMouseMove = (e) => {
     const rect = buttonElement.getBoundingClientRect();
     const relX = e.clientX - (rect.left + rect.width / 2);
     const relY = e.clientY - (rect.top + rect.height / 2);
 
-    xTo(relX * 0.25);
-    yTo(relY * 0.25);
+    xTo(relX * 0.2);
+    yTo(relY * 0.2);
   };
 
   const handleMouseLeave = () => {
@@ -190,8 +162,8 @@ export function initMagneticButton(buttonElement) {
     yTo(0);
   };
 
-  buttonElement.addEventListener("mousemove", handleMouseMove);
-  buttonElement.addEventListener("mouseleave", handleMouseLeave);
+  buttonElement.addEventListener("mousemove", handleMouseMove, { passive: true });
+  buttonElement.addEventListener("mouseleave", handleMouseLeave, { passive: true });
 
   return () => {
     buttonElement.removeEventListener("mousemove", handleMouseMove);
@@ -200,81 +172,35 @@ export function initMagneticButton(buttonElement) {
 }
 
 /**
- * Item 7: Animated Counter Numbers from 0 to target on ScrollTrigger
- */
-export function initAnimatedCounters(containerElement) {
-  if (!containerElement) return () => {};
-  const counterElements = containerElement.querySelectorAll("[data-counter-target]");
-
-  if (isReducedMotion()) {
-    counterElements.forEach((el) => {
-      const targetVal = el.getAttribute("data-counter-target") || "0";
-      const suffix = el.getAttribute("data-counter-suffix") || "";
-      const prefix = el.getAttribute("data-counter-prefix") || "";
-      el.innerText = `${prefix}${targetVal}${suffix}`;
-    });
-    return () => {};
-  }
-
-  const ctx = gsap.context(() => {
-    counterElements.forEach((el) => {
-      const targetVal = parseFloat(el.getAttribute("data-counter-target")) || 0;
-      const suffix = el.getAttribute("data-counter-suffix") || "";
-      const prefix = el.getAttribute("data-counter-prefix") || "";
-      const obj = { val: 0 };
-
-      gsap.to(obj, {
-        val: targetVal,
-        duration: 1.5,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: el,
-          start: "top 95%",
-          toggleActions: "play none none none",
-          once: true,
-        },
-        onUpdate: () => {
-          el.innerText = `${prefix}${Math.floor(obj.val)}${suffix}`;
-        },
-        onComplete: () => {
-          el.innerText = `${prefix}${targetVal}${suffix}`;
-        },
-      });
-    });
-  }, containerElement);
-
-  return () => ctx.revert();
-}
-
-/**
- * Creates clean GSAP ScrollTrigger batch animations with automatic context cleanup
+ * Clean GSAP ScrollTrigger batch animations with automatic context cleanup
  */
 export function initScrollReveals(containerElement) {
   if (!containerElement || isReducedMotion()) return () => {};
 
   const ctx = gsap.context(() => {
-    // Reveal section headers with split text
+    // Reveal section headers smoothly
     const headers = containerElement.querySelectorAll("[data-reveal='header']");
     headers.forEach((header) => {
-      initSplitHeadline(header, { start: "top 88%" });
+      initSplitHeadline(header, { start: "top 90%" });
     });
 
-    // Staggered grid cards — subtle y-slide only, no opacity hiding (prevents latency feel)
+    // Staggered grid cards
     const grids = containerElement.querySelectorAll("[data-reveal-grid]");
     grids.forEach((grid) => {
       const items = grid.querySelectorAll("[data-reveal-item]");
       if (items.length > 0) {
         gsap.fromTo(
           items,
-          { y: ANIM.yOffset },
+          { y: ANIM.yOffset, opacity: 0.95 },
           {
             y: 0,
+            opacity: 1,
             duration: ANIM.duration,
             stagger: ANIM.stagger,
             ease: ANIM.ease,
             scrollTrigger: {
               trigger: grid,
-              start: "top 85%",
+              start: "top 88%",
               toggleActions: "play none none none",
               once: true,
             },
@@ -287,7 +213,6 @@ export function initScrollReveals(containerElement) {
   return () => ctx.revert();
 }
 
-
 /**
  * Hero section entrance animation sequence
  */
@@ -298,29 +223,24 @@ export function initHeroEntrance({ container, eyebrow, headline, lead, cta, imag
     const tl = gsap.timeline({ defaults: { ease: ANIM.ease } });
 
     if (eyebrow) {
-      tl.fromTo(eyebrow, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 });
+      tl.fromTo(eyebrow, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4 });
     }
 
     if (headline) {
-      initSplitHeadline(headline);
+      tl.fromTo(headline, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.2");
     }
 
     if (lead) {
-      tl.fromTo(lead, { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.4");
+      tl.fromTo(lead, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3");
     }
 
     if (cta) {
-      tl.fromTo(cta, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, "-=0.3");
+      tl.fromTo(cta, { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.4 }, "-=0.25");
       initMagneticButton(cta);
     }
 
     if (image) {
-      tl.fromTo(image, { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.8 }, "-=0.5");
-
-      initMultiLayerParallax({
-        container,
-        bgLayer: image,
-      });
+      tl.fromTo(image, { opacity: 0, scale: 0.97 }, { opacity: 1, scale: 1, duration: 0.6 }, "-=0.4");
     }
   }, container);
 

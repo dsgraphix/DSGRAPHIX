@@ -58,25 +58,9 @@ export function HomePage() {
 
     const revealCleanup = initScrollReveals(pageRef.current);
 
-    const ctx = gsap.context(() => {
-      // Diagonal strip horizontal scrub
-      if (diagonalStripRef.current) {
-        gsap.to(diagonalStripRef.current, {
-          scrollTrigger: {
-            trigger: diagonalStripRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
-          },
-          xPercent: -4,
-        });
-      }
-    }, pageRef.current);
-
     return () => {
       heroCleanup();
       revealCleanup();
-      ctx.revert();
     };
   }, []);
 
@@ -286,30 +270,15 @@ export function HomePage() {
             {featuredCases.map((cs) => (
               <div
                 key={cs.slug}
-                className="brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 group overflow-hidden flex flex-col justify-between"
-                onMouseMove={(e) => {
-                  const card = e.currentTarget;
-                  const img = card.querySelector('[data-hover-img]');
-                  if (!img) return;
-                  const rect = card.getBoundingClientRect();
-                  const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
-                  const y = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
-                  img.style.transform = `translate(${x}px, ${y}px) scale(1.06)`;
-                }}
-                onMouseLeave={(e) => {
-                  const img = e.currentTarget.querySelector('[data-hover-img]');
-                  if (img) img.style.transform = 'translate(0px, 0px) scale(1)';
-                }}
+                className="brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-300 group overflow-hidden flex flex-col justify-between"
               >
                 <div>
-                  <div className="relative aspect-16/10 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-700">
+                  <div className="relative aspect-16/10 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-500">
                     <img
-                      data-hover-img
                       src={cs.image}
                       alt={cs.title}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 ease-out"
-                      style={{ willChange: 'transform' }}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                     <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
                       {cs.category}

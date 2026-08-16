@@ -102,30 +102,15 @@ export function PortfolioPage() {
                   key={cs.id || cs.slug}
                   data-reveal-item
                   onClick={() => setSelectedCase(cs)}
-                  className="group cursor-pointer brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 overflow-hidden flex flex-col justify-between"
-                  onMouseMove={(e) => {
-                    const card = e.currentTarget;
-                    const img = card.querySelector('[data-hover-img]');
-                    if (!img) return;
-                    const rect = card.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
-                    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
-                    img.style.transform = `translate(${x}px, ${y}px) scale(1.06)`;
-                  }}
-                  onMouseLeave={(e) => {
-                    const img = e.currentTarget.querySelector('[data-hover-img]');
-                    if (img) img.style.transform = 'translate(0px, 0px) scale(1)';
-                  }}
+                  className="group cursor-pointer brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-300 overflow-hidden flex flex-col justify-between"
                 >
                   <div>
                     <div data-reveal-image className="relative aspect-4/3 overflow-hidden border-b-2 border-white">
                       <img
-                        data-hover-img
                         src={cs.image}
                         alt={cs.title}
                         loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-500 ease-out"
-                        style={{ willChange: 'transform' }}
+                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                         onError={(e) => {
                           e.target.src = '/assets/fintech_app.png';
                         }}

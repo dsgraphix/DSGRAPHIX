@@ -1,17 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { isReducedMotion } from "@/lib/motion";
 
 export function AnimatedCounter({ target, prefix = "", suffix = "" }) {
-  const [count, setCount] = useState(0);
   const elementRef = useRef(null);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !elementRef.current) return;
 
     if (isReducedMotion()) {
-      setCount(target);
+      elementRef.current.textContent = `${prefix}${target}${suffix}`;
       return;
     }
 
@@ -21,8 +20,8 @@ export function AnimatedCounter({ target, prefix = "", suffix = "" }) {
     const ctx = gsap.context(() => {
       gsap.to(obj, {
         val: target,
-        duration: 1.8,
-        ease: "power3.out",
+        duration: 1.2,
+        ease: "power2.out",
         scrollTrigger: {
           trigger: elementRef.current,
           start: "top 92%",
@@ -30,22 +29,24 @@ export function AnimatedCounter({ target, prefix = "", suffix = "" }) {
           once: true,
         },
         onUpdate: () => {
-          setCount(Math.floor(obj.val));
+          if (elementRef.current) {
+            elementRef.current.textContent = `${prefix}${Math.floor(obj.val)}${suffix}`;
+          }
         },
         onComplete: () => {
-          setCount(target);
+          if (elementRef.current) {
+            elementRef.current.textContent = `${prefix}${target}${suffix}`;
+          }
         },
       });
     }, elementRef);
 
     return () => ctx.revert();
-  }, [target]);
+  }, [target, prefix, suffix]);
 
   return (
     <span ref={elementRef}>
-      {prefix}
-      {count}
-      {suffix}
+      {prefix}0{suffix}
     </span>
   );
 }

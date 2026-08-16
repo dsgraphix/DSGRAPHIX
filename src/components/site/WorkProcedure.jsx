@@ -9,21 +9,18 @@ export function WorkProcedure() {
       title: "CLIENT DESIGN CONSULTATION",
       description:
         "Collaborative discovery workshops and deep-dive alignment on commercial objectives.",
-      dark: false,
     },
     {
       icon: PenTool,
       title: "PROTOTYPING DESIGN",
       description:
         "High-fidelity interactive prototypes and design system token architecture.",
-      dark: true,
     },
     {
       icon: Monitor,
       title: "PROCESSING TO DESIGN",
       description:
         "Developer-ready asset handoffs, complete specification documentation, and production rollout.",
-      dark: false,
     },
   ];
 
@@ -73,29 +70,36 @@ export function WorkProcedure() {
           </h2>
         </div>
 
-        {/* 3 Top Cards Grid */}
+        {/* 3 Top Cards Grid - Middle box is default orange with white hover */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {topCards.map((card, idx) => {
             const IconComponent = card.icon;
+            const isMiddle = idx === 1;
             return (
               <div
                 key={idx}
-                className={`p-8 brutalist-border transition-all duration-300 ${
-                  card.dark
-                    ? "bg-[#FF6636] text-[#2A2A29]"
+                className={`p-8 brutalist-border transition-all duration-300 group cursor-pointer ${
+                  isMiddle
+                    ? "bg-[#FF6636] text-[#2A2A29] hover:bg-white hover:text-[#2A2A29]"
                     : "bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29]"
                 }`}
               >
                 <div className="mb-6">
                   <IconComponent
-                    className="h-10 w-10"
+                    className={`h-10 w-10 transition-colors ${
+                      isMiddle
+                        ? "text-[#2A2A29] group-hover:text-[#2A2A29]"
+                        : "text-[#FF6636] group-hover:text-[#2A2A29]"
+                    }`}
                     strokeWidth={2}
                   />
                 </div>
-                <h3 className="font-display text-xl font-black uppercase tracking-wide mb-4">
+                <h3 className="font-display text-xl font-black uppercase tracking-wide mb-4 group-hover:text-[#2A2A29] transition-colors">
                   {card.title}
                 </h3>
-                <p className="text-sm font-bold opacity-90 leading-relaxed">
+                <p className={`text-sm font-bold leading-relaxed group-hover:text-[#2A2A29] transition-colors ${
+                  isMiddle ? "opacity-95 text-[#2A2A29]" : "opacity-90 text-slate-200"
+                }`}>
                   {card.description}
                 </p>
               </div>

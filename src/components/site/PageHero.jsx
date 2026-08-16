@@ -20,7 +20,7 @@ export function PageHero({ eyebrow, title, lead, className = "" }) {
       heroCleanup();
       splitCleanup();
     };
-  }, [title]);
+  }, []);
 
   return (
     <section ref={containerRef} className={`bg-[#2A2A29] text-white py-16 lg:py-24 border-b-2 border-white relative overflow-hidden ${className}`}>

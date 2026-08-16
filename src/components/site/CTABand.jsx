@@ -28,13 +28,23 @@ export function CTABand({
 
           {/* Right Column Action */}
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto shrink-0">
-            <Button asChild variant="brand" size="xl" className="w-full sm:w-auto group-hover:bg-[#2A2A29] group-hover:text-white group-hover:border-[#2A2A29]">
+            <Button
+              asChild
+              variant="brand"
+              size="xl"
+              className="w-full sm:w-auto group-hover:bg-[#2A2A29] group-hover:text-white group-hover:border-[#2A2A29] hover:!bg-white hover:!text-[#2A2A29] hover:!border-[#2A2A29] transition-all"
+            >
               <Link to="/quote">
                 Get a Quote
                 <ArrowUpRight className="h-5 w-5 ml-1" />
               </Link>
             </Button>
-            <Button asChild variant="outline" size="xl" className="w-full sm:w-auto group-hover:border-[#2A2A29] group-hover:text-[#2A2A29]">
+            <Button
+              asChild
+              variant="outline"
+              size="xl"
+              className="w-full sm:w-auto group-hover:bg-[#2A2A29] group-hover:text-white group-hover:border-[#2A2A29] hover:!bg-white hover:!text-[#2A2A29] hover:!border-[#2A2A29] transition-all"
+            >
               <a href={whatsappLink()} target="_blank" rel="noreferrer">
                 <MessageCircle className="h-5 w-5 mr-1" />
                 WhatsApp Us

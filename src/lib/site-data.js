@@ -224,14 +224,14 @@ export const TESTIMONIALS = [
 ];
 
 export const CLIENTS = [
-  "Paylane",
-  "Northloop",
-  "Aurelle",
-  "Kite Labs",
-  "Cartway",
-  "Copper & Clay",
-  "Vantage",
-  "Beacon Health"
+  "Technewity Labs",
+  "Own Fresh",
+  "Accu Design",
+  "Damechess",
+  "Technewity Labs",
+  "Own Fresh",
+  "Accu Design",
+  "Damechess"
 ];
 
 export const FAQS = [
