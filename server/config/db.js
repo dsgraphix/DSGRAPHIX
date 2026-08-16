@@ -84,10 +84,21 @@ let pool = null;
 let memoryDb = null; // Fallback in-memory database if DATABASE_URL is not set yet
 
 if (config.databaseUrl) {
-  const isCloud = config.databaseUrl.includes('neon.tech') || config.databaseUrl.includes('supabase') || config.databaseUrl.includes('sslmode=require') || config.databaseUrl.includes('amazonaws.com');
+  const isCloud = config.databaseUrl.includes('neon.tech') || config.databaseUrl.includes('supabase') || config.databaseUrl.includes('sslmode=') || config.databaseUrl.includes('amazonaws.com');
   pool = new Pool({
     connectionString: config.databaseUrl,
-    ssl: isCloud ? { rejectUnauthorized: false } : false
+    ssl: isCloud ? { rejectUnauthorized: false } : false,
+    max: 5,                         // keep Railway container memory low
+    idleTimeoutMillis: 30_000,      // release idle clients after 30s (Neon drops them at ~300s)
+    connectionTimeoutMillis: 10_000 // fail fast if DB is unreachable on startup
+  });
+
+  // CRITICAL: without this handler, an idle client that gets dropped by Neon
+  // emits an 'error' EventEmitter event. Node treats unhandled EventEmitter errors
+  // as uncaught exceptions and kills the process — causing the SIGTERM crash loop.
+  pool.on('error', (err) => {
+    console.error('❌ Unexpected pg pool error (idle client):', err.message);
+    // Do NOT call process.exit here — the pool will recover on the next query
   });
 } else {
   console.log('💡 Note: DATABASE_URL not set in server/.env. Using resilient memory database store for dev testing.');

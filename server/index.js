@@ -40,7 +40,11 @@ app.use(cors({
       callback(new Error(`CORS blocked for origin: ${origin}`));
     }
   },
-  credentials: true
+  credentials: true,
+  // Fix B: explicitly allow Authorization header so authFetch Bearer tokens
+  // are never silently stripped by a strict CORS preflight
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Authorization']
 }));
 app.use(cookieParser());
 app.use(express.json());

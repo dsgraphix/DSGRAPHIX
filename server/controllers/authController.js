@@ -48,7 +48,8 @@ export async function login(req, res) {
       token
     });
   } catch (err) {
-    console.error('Login error:', err);
+    console.error('Login error:', err.message);
+    console.error(err.stack); // full stack trace visible in Railway log viewer
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
