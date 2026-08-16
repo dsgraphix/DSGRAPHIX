@@ -66,7 +66,7 @@ export function SiteSearch({ variant = "icon" }) {
         <button
           onClick={() => setOpen(true)}
           aria-label="Search site"
-          className="flex h-10 w-10 items-center justify-center brutalist-border bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29] transition-colors relative cursor-pointer"
+          className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center brutalist-border bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29] transition-colors relative cursor-pointer"
         >
           <Search className="h-4 w-4" />
         </button>
@@ -79,7 +79,7 @@ export function SiteSearch({ variant = "icon" }) {
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          <div data-lenis-prevent="true" className="relative w-full max-w-xl bg-[#2A2A29] brutalist-border text-white overflow-hidden z-10">
+          <div data-lenis-prevent="true" className="relative w-full max-w-xl bg-[#2A2A29] brutalist-border text-white overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center border-b-2 border-white px-4 py-3">
               <Search className="h-5 w-5 text-[#FF6636] mr-3 shrink-0" />
               <input
@@ -92,7 +92,8 @@ export function SiteSearch({ variant = "icon" }) {
               />
               <button
                 onClick={() => setOpen(false)}
-                className="p-1 text-slate-400 hover:text-white"
+                className="w-10 h-10 min-w-[44px] min-h-[44px] inline-flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                aria-label="Close search modal"
               >
                 <X className="h-5 w-5" />
               </button>

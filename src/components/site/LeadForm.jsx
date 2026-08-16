@@ -78,7 +78,7 @@ export function LeadForm({ defaultService = "" }) {
     "Something else"
   ];
 
-  const inputClasses = "w-full rounded-none border-2 border-white bg-[#2A2A29] px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:border-[#FF6636] focus:outline-none font-bold";
+  const inputClasses = "w-full rounded-none border-2 border-white bg-[#2A2A29] h-12 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:border-[#FF6636] focus:ring-2 focus:ring-[#FF6636]/30 focus:outline-none font-bold transition-all duration-200";
 
   if (submitted) {
     return (
@@ -241,20 +241,20 @@ export function LeadForm({ defaultService = "" }) {
             placeholder="Describe your project, goals, key deliverables, or links to reference sites..."
             value={formData.details}
             onChange={handleChange}
-            className={`${inputClasses} resize-y`}
+            className={`${inputClasses} h-auto min-h-[100px] resize-y`}
           />
         </div>
 
-        <Button type="submit" variant="brand" size="xl" className="w-full" disabled={loading}>
+        <Button type="submit" variant="brand" size="xl" className="w-full inline-flex flex-row items-center justify-center gap-2.5 whitespace-nowrap" disabled={loading}>
           {loading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Sending Enquiry...
+              <Loader2 className="h-5 w-5 animate-spin shrink-0" />
+              <span>Sending Enquiry...</span>
             </>
           ) : (
             <>
-              Send Enquiry
-              <ArrowRight className="h-4 w-4 ml-1" />
+              <span>Send Enquiry</span>
+              <ArrowRight className="h-5 w-5 shrink-0" />
             </>
           )}
         </Button>

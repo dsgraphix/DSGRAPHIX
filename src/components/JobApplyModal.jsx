@@ -27,6 +27,17 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "General Application
     }
   }, [jobTitle]);
 
+  // Escape key close listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && isOpen) {
+        handleReset();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -98,7 +109,7 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "General Application
     >
       <div
         data-lenis-prevent="true"
-        className="w-full max-w-xl brutalist-border bg-[#2A2A29] text-white overflow-hidden shadow-2xl my-8 max-h-[90vh] overflow-y-auto overscroll-contain"
+        className="w-full max-w-xl brutalist-border bg-[#2A2A29] text-white overflow-hidden shadow-2xl my-8 max-h-[90vh] overflow-y-auto overscroll-contain animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -113,7 +124,8 @@ export function JobApplyModal({ isOpen, onClose, jobTitle = "General Application
           </div>
           <button
             onClick={handleReset}
-            className="p-2 brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-colors"
+            className="w-10 h-10 min-w-[44px] min-h-[44px] inline-flex items-center justify-center brutalist-border bg-[#2A2A29] text-white hover:bg-[#FF6636] hover:text-[#2A2A29] transition-colors cursor-pointer"
+            aria-label="Close modal"
           >
             <X size={20} />
           </button>

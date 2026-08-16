@@ -18,9 +18,9 @@ export function NotFoundPage() {
         </p>
         <div className="pt-4">
           <Button asChild variant="brand" size="xl">
-            <Link to="/">
-              <Home className="h-5 w-5 mr-2" />
-              Go Back Home
+            <Link to="/" className="inline-flex flex-row items-center justify-center gap-2.5 whitespace-nowrap">
+              <Home className="h-5 w-5 shrink-0" />
+              <span>Go Back Home</span>
             </Link>
           </Button>
         </div>

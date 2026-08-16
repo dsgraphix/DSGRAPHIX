@@ -5,9 +5,13 @@ export default async function handler(req, res) {
 
   try {
     const data = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const apiKey = process.env.RESEND_API_KEY || 're_JFqrtuwr_G8xWRztD9W9Z76wHFF2bAtPx';
+    const apiKey = process.env.RESEND_API_KEY;
     const fromEmail = process.env.FROM_EMAIL || 'DS-Graphix <hello@dsgraphix.in>';
     const toEmail = process.env.TO_EMAIL || 'hello@dsgraphix.in';
+
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Email service not configured. Set RESEND_API_KEY in environment variables.' });
+    }
 
     const payload = {
       from: fromEmail,

@@ -32,41 +32,31 @@ export function WorkProcedure() {
       num: "01",
       name: "Empathize",
       icon: Heart,
-      color: "#4A90E2",
       bgBadge: "bg-[#4A90E2]",
-      textBadge: "text-[#4A90E2]",
     },
     {
       num: "02",
       name: "Define",
       icon: Search,
-      color: "#41B883",
       bgBadge: "bg-[#41B883]",
-      textBadge: "text-[#41B883]",
     },
     {
       num: "03",
       name: "Ideate",
       icon: Lightbulb,
-      color: "#F5A623",
       bgBadge: "bg-[#F5A623]",
-      textBadge: "text-[#F5A623]",
     },
     {
       num: "04",
       name: "Prototype",
       icon: Plane,
-      color: "#FF7A00",
       bgBadge: "bg-[#FF7A00]",
-      textBadge: "text-[#FF7A00]",
     },
     {
       num: "05",
       name: "Test",
       icon: CheckCircle2,
-      color: "#C02C2C",
       bgBadge: "bg-[#C02C2C]",
-      textBadge: "text-[#C02C2C]",
     },
   ];
 
@@ -113,7 +103,7 @@ export function WorkProcedure() {
           })}
         </div>
 
-        {/* Bottom 5-Step Interlocking Circular Diagram (Exact Uploaded PNG Image) */}
+        {/* Bottom 5-Step Interlocking Circular Diagram */}
         <div className="pt-6">
           <div className="text-center mb-8">
             <h3 className="font-display text-2xl sm:text-3xl font-black uppercase text-white tracking-tight">
@@ -124,7 +114,7 @@ export function WorkProcedure() {
             </p>
           </div>
 
-          {/* Direct Uploaded Image Container */}
+          {/* Process Flow Image */}
           <div className="brutalist-border bg-white p-4 sm:p-8 rounded-xl shadow-2xl overflow-hidden">
             <img
               src={processFlowPng}
@@ -134,33 +124,33 @@ export function WorkProcedure() {
           </div>
         </div>
 
-          {/* Mobile Responsive Process Cards */}
-          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-            {processSteps.map((step, idx) => {
-              const IconComp = step.icon;
-              return (
+        {/* Mobile Responsive Process Cards */}
+        <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {processSteps.map((step, idx) => {
+            const IconComp = step.icon;
+            return (
+              <div
+                key={idx}
+                className="p-5 brutalist-border bg-[#1E1E1D] flex items-center gap-4 text-white hover:border-[#FF6636] transition-colors"
+              >
                 <div
-                  key={idx}
-                  className="p-5 brutalist-border bg-[#1E1E1D] flex items-center gap-4 text-white hover:border-[#FF6636] transition-colors"
+                  className={`h-12 w-12 flex items-center justify-center text-white shrink-0 brutalist-border ${step.bgBadge}`}
                 >
-                  <div
-                    className={`h-12 w-12 flex items-center justify-center text-white shrink-0 brutalist-border ${step.bgBadge}`}
-                  >
-                    <IconComp className="h-6 w-6" strokeWidth={2.5} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-[#FF6636] block uppercase tracking-wider">
-                      Stage {step.num}
-                    </span>
-                    <h4 className="font-display text-lg font-black uppercase tracking-tight">
-                      {step.name}
-                    </h4>
-                  </div>
+                  <IconComp className="h-6 w-6" strokeWidth={2.5} />
                 </div>
-              );
-            })}
-          </div>
+                <div>
+                  <span className="text-xs font-bold text-[#FF6636] block uppercase tracking-wider">
+                    Stage {step.num}
+                  </span>
+                  <h4 className="font-display text-lg font-black uppercase tracking-tight">
+                    {step.name}
+                  </h4>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </section>
+      </div>
+    </section>
   );
 }

@@ -1,75 +1,55 @@
-import React from 'react';
-import { X, Play, Volume2, Film } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X, Film } from 'lucide-react';
 import { useModalScrollLock } from '@/hooks/useModalScrollLock';
 
 export default function VideoModal({ isOpen, videoData, onClose }) {
   useModalScrollLock(Boolean(isOpen && videoData));
+
+  // Escape key close listener
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !videoData) return null;
 
   return (
     <div
       data-lenis-prevent="true"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(15, 15, 14, 0.92)',
-        backdropFilter: 'blur(16px)',
-        zIndex: 1300,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px'
-      }}
+      className="fixed inset-0 z-[1300] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md overflow-y-auto overscroll-contain animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
         data-lenis-prevent="true"
-        style={{
-          width: '100%',
-          maxWidth: '850px',
-          background: '#1E1E1D',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-lg)',
-          overflow: 'hidden',
-          border: '1px solid rgba(255, 102, 54, 0.3)'
-        }}
+        className="relative w-full max-w-4xl brutalist-border bg-[#2A2A29] text-white overflow-hidden shadow-2xl my-8 animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header bar */}
-        <div
-          style={{
-            padding: '16px 24px',
-            background: '#151514',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            color: '#FFFFFF'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Film size={20} color="var(--color-primary)" />
-            <span style={{ fontWeight: '700', fontSize: '16px' }}>{videoData.title || 'DS-Graphix Motion Reel Showcase'}</span>
+        <div className="px-6 py-4 bg-[#1F1F1E] border-b-2 border-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Film className="h-5 w-5 text-[#FF6636]" />
+            <span className="font-display font-black uppercase text-base tracking-tight">
+              {videoData.title || 'DS-Graphix Motion Reel Showcase'}
+            </span>
           </div>
-          <button onClick={onClose} style={{ background: 'none', color: '#FFFFFF', cursor: 'pointer' }}>
-            <X size={22} />
+          <button
+            onClick={onClose}
+            className="w-10 h-10 min-w-[44px] min-h-[44px] inline-flex items-center justify-center brutalist-border bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29] transition-colors cursor-pointer"
+            aria-label="Close modal"
+          >
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Video Player Display Container */}
-        <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', background: '#000000' }}>
+        <div className="relative w-full aspect-video bg-black">
           <iframe
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              border: 'none'
-            }}
+            className="absolute inset-0 w-full h-full border-none"
             src={videoData.videoUrl || "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"}
             title="Video Reel Preview"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -78,12 +58,16 @@ export default function VideoModal({ isOpen, videoData, onClose }) {
         </div>
 
         {/* Footer info */}
-        <div style={{ padding: '20px 24px', background: '#1E1E1D', color: '#A0A09E', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="p-5 sm:p-6 bg-[#1F1F1E] border-t-2 border-white/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div style={{ color: '#FFFFFF', fontWeight: '700' }}>{videoData.client || 'DS-Graphix Production'}</div>
-            <div style={{ fontSize: '13px' }}>{videoData.overview || '3D Motion graphics, viral social reels, and high-impact promo video editing.'}</div>
+            <div className="font-display font-black uppercase text-sm text-white">
+              {videoData.client || 'DS-Graphix Production'}
+            </div>
+            <div className="text-xs font-sans text-white/70 mt-0.5">
+              {videoData.overview || '3D Motion graphics, viral social reels, and high-impact promo video editing.'}
+            </div>
           </div>
-          <div style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '6px 14px', borderRadius: 'var(--radius-full)', fontWeight: '700', fontSize: '13px' }}>
+          <div className="inline-flex items-center justify-center px-4 py-1.5 brutalist-border bg-[#FF6636] text-[#2A2A29] font-display text-xs font-black uppercase tracking-wider shrink-0">
             {videoData.category || 'Motion Reels'}
           </div>
         </div>

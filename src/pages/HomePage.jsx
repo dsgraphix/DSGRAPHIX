@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Quote, ArrowUpRight, MessageCircle } from "lucide-react";
 import { gsap } from "gsap";
@@ -8,20 +8,55 @@ import logoImg from "@/assets/logo.png";
 import { Button } from "@/components/ui/button";
 import { CTABand } from "@/components/site/CTABand";
 import { WorkProcedure } from "@/components/site/WorkProcedure";
-import { SERVICES, CASE_STUDIES, PROCESS, STATS, CLIENTS, TESTIMONIALS, whatsappLink } from "@/lib/site-data";
+import { SERVICES, CASE_STUDIES as FALLBACK_CASES, PROCESS, STATS, CLIENTS, TESTIMONIALS, whatsappLink } from "@/lib/site-data";
+import { AnimatedCounter } from "@/components/site/AnimatedCounter";
+import { initScrollReveals, initHeroEntrance, isReducedMotion } from "@/lib/motion";
 
 export function HomePage() {
-  const featuredCases = CASE_STUDIES.slice(0, 4);
+  const [featuredCases, setFeaturedCases] = useState(FALLBACK_CASES.slice(0, 4));
   const featuredTestimonial = TESTIMONIALS[0];
 
+  const pageRef = useRef(null);
+  const heroContainerRef = useRef(null);
+  const heroEyebrowRef = useRef(null);
   const heroHeadlineRef = useRef(null);
+  const heroLeadRef = useRef(null);
+  const heroCtaRef = useRef(null);
+  const heroImageRef = useRef(null);
   const diagonalStripRef = useRef(null);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
+    async function loadProjects() {
+      try {
+        const res = await fetch("/api/projects");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && json.data.length > 0) {
+            setFeaturedCases(json.data.slice(0, 4));
+          }
+        }
+      } catch (err) {
+        console.warn("API offline, using fallback case studies for homepage.");
+      }
+    }
+    loadProjects();
+  }, []);
+
+  useEffect(() => {
+    if (isReducedMotion()) return;
 
     gsap.registerPlugin(ScrollTrigger);
+
+    const heroCleanup = initHeroEntrance({
+      container: heroContainerRef.current,
+      eyebrow: heroEyebrowRef.current,
+      headline: heroHeadlineRef.current,
+      lead: heroLeadRef.current,
+      cta: heroCtaRef.current,
+      image: heroImageRef.current,
+    });
+
+    const revealCleanup = initScrollReveals(pageRef.current);
 
     const ctx = gsap.context(() => {
       // Diagonal strip horizontal scrub
@@ -36,20 +71,24 @@ export function HomePage() {
           xPercent: -4,
         });
       }
-    });
+    }, pageRef.current);
 
-    return () => ctx.revert();
+    return () => {
+      heroCleanup();
+      revealCleanup();
+      ctx.revert();
+    };
   }, []);
 
   return (
-    <div className="space-y-0 bg-[#2A2A29] text-white">
+    <div ref={pageRef} className="space-y-0 bg-[#2A2A29] text-white">
       {/* 1. Hero Section */}
-      <section className="bg-[#2A2A29] min-h-[85vh] pt-12 pb-20 sm:py-24 px-4 sm:px-6 lg:px-8 flex flex-col justify-center relative overflow-hidden border-b-2 border-white">
+      <section ref={heroContainerRef} className="bg-[#2A2A29] min-h-[85vh] pt-12 pb-20 sm:py-24 px-4 sm:px-6 lg:px-8 flex flex-col justify-center relative overflow-hidden border-b-2 border-white">
         <div className="container-page relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
             <div className="lg:col-span-7 space-y-8 relative">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 brutalist-border bg-white/5 backdrop-blur-md">
+              <div ref={heroEyebrowRef} className="inline-flex items-center gap-2 px-3.5 py-1.5 brutalist-border bg-white/5 backdrop-blur-md">
                 <span className="h-2 w-2 rounded-full bg-[#FF6636] animate-pulse" />
                 <span className="text-[#FF6636] font-bold uppercase tracking-[0.2em] text-xs sm:text-sm">
                   Full-Service Creative & Digital Studio
@@ -57,17 +96,17 @@ export function HomePage() {
               </div>
 
               <div>
-                <h1 className="font-display text-[clamp(2.5rem,5.5vw,5.2rem)] font-black leading-[0.95] uppercase tracking-tighter text-white">
+                <h1 ref={heroHeadlineRef} className="font-display text-[clamp(2.5rem,5.5vw,5.2rem)] font-black leading-[0.95] uppercase tracking-tighter text-white">
                   Design that makes your brand{" "}
                   <span className="text-[#FF6636] block sm:inline">impossible to ignore.</span>
                 </h1>
               </div>
 
-              <p className="text-base sm:text-xl text-[#F2F4F8] font-semibold leading-relaxed max-w-xl border-l-4 border-[#FF6636] pl-5">
+              <p ref={heroLeadRef} className="text-base sm:text-xl text-[#F2F4F8] font-semibold leading-relaxed max-w-xl border-l-4 border-[#FF6636] pl-5">
                 We engineer digital products, craft brand identity systems, and produce platform-native content for fast-growing companies worldwide.
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div ref={heroCtaRef} className="flex flex-wrap items-center gap-4 pt-2">
                 <Button asChild variant="brand" size="xl">
                   <Link to="/quote">
                     Get a Quote
@@ -99,10 +138,10 @@ export function HomePage() {
             </div>
 
             {/* Right Graphic Frame Showcase */}
-            <div className="lg:col-span-5 relative mt-6 lg:mt-0">
+            <div ref={heroImageRef} className="lg:col-span-5 relative mt-6 lg:mt-0">
               <div className="brutalist-border overflow-hidden bg-[#1E1E1D] p-6 sm:p-8 space-y-6 relative group shadow-2xl">
                 {/* Visual Header Banner with Logo Container */}
-                <div className="relative aspect-4/3 rounded bg-white p-6 brutalist-border flex flex-col items-center justify-center shadow-inner overflow-hidden">
+                <div data-reveal-image className="relative aspect-4/3 rounded bg-white p-6 brutalist-border flex flex-col items-center justify-center shadow-inner overflow-hidden">
                   <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden bg-white shadow-xl flex items-center justify-center p-1 border-2 border-[#2A2A29] transition-transform duration-500 group-hover:scale-105">
                     <img
                       src={logoImg}
@@ -155,11 +194,16 @@ export function HomePage() {
       {/* 3. Stats Grid */}
       <section className="bg-[#2A2A29] py-20 border-b-2 border-white">
         <div className="container-page">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {STATS.map((stat, i) => (
-              <div key={i} className="brutalist-border p-6 sm:p-8 bg-[#2A2A29] hover:bg-white hover:text-[#2A2A29] transition-all duration-300 group">
+          <div data-reveal-grid className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { target: 250, suffix: "+", label: "Delivered Projects" },
+              { target: 99, suffix: "%", label: "Client Satisfaction" },
+              { target: 14, suffix: "+", label: "Countries Reached" },
+              { target: 5, suffix: ".0★", label: "Average Rating" },
+            ].map((stat, i) => (
+              <div key={i} data-reveal-item className="brutalist-border p-6 sm:p-8 bg-[#2A2A29] hover:bg-white hover:text-[#2A2A29] transition-all duration-300 group">
                 <div className="font-display text-4xl sm:text-6xl font-black text-[#FF6636] group-hover:text-[#2A2A29] transition-colors tracking-tighter">
-                  {stat.value}
+                  <AnimatedCounter target={stat.target} suffix={stat.suffix} />
                 </div>
                 <div className="text-sm font-bold uppercase tracking-wider mt-2 opacity-80">
                   {stat.label}
@@ -178,7 +222,7 @@ export function HomePage() {
               <span className="text-[#FF6636] font-bold uppercase tracking-[0.3em] text-xs sm:text-sm">
                 What We Do
               </span>
-              <h2 className="font-display text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.9] uppercase tracking-tighter text-white">
+              <h2 data-reveal="header" className="font-display text-4xl sm:text-6xl lg:text-7xl font-black leading-[0.9] uppercase tracking-tighter text-white">
                 THE SERVICE <span className="text-[#FF6636]">CLUSTER</span>
               </h2>
             </div>
@@ -187,10 +231,11 @@ export function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div data-reveal-grid className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {SERVICES.map((service, index) => (
               <div
                 key={service.slug}
+                data-reveal-item
                 className="brutalist-border bg-[#2A2A29] p-8 flex flex-col justify-between hover:bg-white hover:text-[#2A2A29] transition-all duration-500 group min-h-[380px]"
               >
                 <div className="space-y-6">
@@ -242,14 +287,29 @@ export function HomePage() {
               <div
                 key={cs.slug}
                 className="brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 group overflow-hidden flex flex-col justify-between"
+                onMouseMove={(e) => {
+                  const card = e.currentTarget;
+                  const img = card.querySelector('[data-hover-img]');
+                  if (!img) return;
+                  const rect = card.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
+                  const y = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+                  img.style.transform = `translate(${x}px, ${y}px) scale(1.06)`;
+                }}
+                onMouseLeave={(e) => {
+                  const img = e.currentTarget.querySelector('[data-hover-img]');
+                  if (img) img.style.transform = 'translate(0px, 0px) scale(1)';
+                }}
               >
                 <div>
                   <div className="relative aspect-16/10 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-700">
                     <img
+                      data-hover-img
                       src={cs.image}
                       alt={cs.title}
                       loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover transition-transform duration-500 ease-out"
+                      style={{ willChange: 'transform' }}
                     />
                     <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
                       {cs.category}

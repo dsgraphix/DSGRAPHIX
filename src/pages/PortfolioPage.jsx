@@ -1,28 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { X, ArrowRight, CheckCircle2 } from "lucide-react";
+import { X, ArrowRight, CheckCircle2, FolderKanban } from "lucide-react";
 import { PageHero } from "@/components/site/PageHero";
 import { CTABand } from "@/components/site/CTABand";
 import { Button } from "@/components/ui/button";
-import { CASE_STUDIES } from "@/lib/site-data";
+import { CASE_STUDIES as FALLBACK_CASES } from "@/lib/site-data";
 import { useModalScrollLock } from "@/hooks/useModalScrollLock";
+import { initScrollReveals } from "@/lib/motion";
 
 export function PortfolioPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedCase, setSelectedCase] = useState(null);
+  const [projects, setProjects] = useState(FALLBACK_CASES);
+  const [loading, setLoading] = useState(false);
+  const containerRef = useRef(null);
 
   // Lock background scrolling and halt Lenis smooth scroll while project modal is open
   useModalScrollLock(!!selectedCase);
+
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const res = await fetch("/api/projects");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && json.data.length > 0) {
+            setProjects(json.data);
+          }
+        }
+      } catch (err) {
+        console.warn("API offline, rendering fallback case studies.");
+      }
+    }
+    loadProjects();
+  }, []);
+
+  useEffect(() => {
+    const cleanup = initScrollReveals(containerRef.current);
+    return () => cleanup();
+  }, [activeCategory, projects]);
 
   const categories = ["All", "UI/UX", "Branding", "Graphic", "Video"];
 
   const filteredCases =
     activeCategory === "All"
-      ? CASE_STUDIES
-      : CASE_STUDIES.filter((cs) => cs.category === activeCategory);
+      ? projects
+      : projects.filter((cs) => cs.category?.toLowerCase() === activeCategory.toLowerCase());
 
   return (
-    <div className="bg-[#2A2A29] text-white">
+    <div ref={containerRef} className="bg-[#2A2A29] text-white">
       <PageHero
         eyebrow="Selected Work"
         title={<>PROJECTS MEASURED IN <span className="text-[#FF6636]">OUTCOMES, NOT AWARDS.</span></>}
@@ -56,44 +82,78 @@ export function PortfolioPage() {
       {/* Case Studies Grid */}
       <section className="bg-[#2A2A29] section-y border-b-2 border-white">
         <div className="container-page">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCases.map((cs) => (
-              <div
-                key={cs.slug}
-                onClick={() => setSelectedCase(cs)}
-                className="group cursor-pointer brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 overflow-hidden flex flex-col justify-between"
-              >
-                <div>
-                  <div className="relative aspect-4/3 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-700">
-                    <img
-                      src={cs.image}
-                      alt={cs.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-                    <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
-                      {cs.category}
-                    </span>
+          {loading ? (
+            <div className="py-20 text-center flex flex-col items-center">
+              <div className="w-10 h-10 border-4 border-[#FF6636] border-t-transparent animate-spin mb-4" />
+              <p className="font-display font-bold uppercase tracking-wider text-sm">Loading Case Studies...</p>
+            </div>
+          ) : filteredCases.length === 0 ? (
+            <div className="brutalist-border bg-[#2A2A29] p-12 text-center my-8">
+              <FolderKanban className="h-12 w-12 text-[#FF6636] mx-auto mb-3 opacity-60" />
+              <h3 className="font-display font-black text-xl uppercase tracking-tight">No Case Studies Found</h3>
+              <p className="text-xs text-white/60 mt-1 max-w-md mx-auto">
+                No case studies available under "{activeCategory}". Select another category above.
+              </p>
+            </div>
+          ) : (
+            <div data-reveal-grid className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredCases.map((cs) => (
+                <div
+                  key={cs.id || cs.slug}
+                  data-reveal-item
+                  onClick={() => setSelectedCase(cs)}
+                  className="group cursor-pointer brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 overflow-hidden flex flex-col justify-between"
+                  onMouseMove={(e) => {
+                    const card = e.currentTarget;
+                    const img = card.querySelector('[data-hover-img]');
+                    if (!img) return;
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 12;
+                    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 12;
+                    img.style.transform = `translate(${x}px, ${y}px) scale(1.06)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    const img = e.currentTarget.querySelector('[data-hover-img]');
+                    if (img) img.style.transform = 'translate(0px, 0px) scale(1)';
+                  }}
+                >
+                  <div>
+                    <div data-reveal-image className="relative aspect-4/3 overflow-hidden border-b-2 border-white">
+                      <img
+                        data-hover-img
+                        src={cs.image}
+                        alt={cs.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-out"
+                        style={{ willChange: 'transform' }}
+                        onError={(e) => {
+                          e.target.src = '/assets/fintech_app.png';
+                        }}
+                      />
+                      <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
+                        {cs.category}
+                      </span>
+                    </div>
+                    <div className="p-6 space-y-3">
+                      <p className="text-xs font-black text-[#FF6636] group-hover:text-[#2A2A29] uppercase tracking-wider">
+                        Client: {cs.client}
+                      </p>
+                      <h3 className="font-display text-2xl font-black uppercase leading-tight">
+                        {cs.title}
+                      </h3>
+                      <p className="text-sm font-bold opacity-80 line-clamp-2">
+                        {cs.excerpt}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-6 space-y-3">
-                    <p className="text-xs font-black text-[#FF6636] group-hover:text-[#2A2A29] uppercase tracking-wider">
-                      Client: {cs.client}
-                    </p>
-                    <h3 className="font-display text-2xl font-black uppercase leading-tight">
-                      {cs.title}
-                    </h3>
-                    <p className="text-sm font-bold opacity-80 line-clamp-2">
-                      {cs.excerpt}
-                    </p>
+                  <div className="p-6 pt-0 border-t-2 border-white/20 group-hover:border-[#2A2A29]/20 mt-4 flex items-center justify-between text-xs font-black uppercase tracking-wider">
+                    <span className="text-[#FF6636] group-hover:text-[#2A2A29]">{cs.result}</span>
+                    <span className="group-hover:underline">View Details →</span>
                   </div>
                 </div>
-                <div className="p-6 pt-0 border-t-2 border-white/20 group-hover:border-[#2A2A29]/20 mt-4 flex items-center justify-between text-xs font-black uppercase tracking-wider">
-                  <span className="text-[#FF6636] group-hover:text-[#2A2A29]">{cs.result}</span>
-                  <span className="group-hover:underline">View Details →</span>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -128,6 +188,9 @@ export function PortfolioPage() {
                 src={selectedCase.image}
                 alt={selectedCase.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = '/assets/fintech_app.png';
+                }}
               />
             </div>
 
@@ -139,13 +202,15 @@ export function PortfolioPage() {
                 {selectedCase.excerpt}
               </p>
 
-              <div className="brutalist-border bg-[#FF6636] text-[#2A2A29] p-5 flex items-center gap-4">
-                <CheckCircle2 className="h-6 w-6 shrink-0" />
-                <div>
-                  <div className="text-xs font-black uppercase tracking-wider">Verified Outcome</div>
-                  <div className="font-display text-xl font-black">{selectedCase.result}</div>
+              {selectedCase.result && (
+                <div className="brutalist-border bg-[#FF6636] text-[#2A2A29] p-5 flex items-center gap-4">
+                  <CheckCircle2 className="h-6 w-6 shrink-0" />
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-wider">Verified Outcome</div>
+                    <div className="font-display text-xl font-black">{selectedCase.result}</div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="pt-6 border-t-2 border-white flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -172,3 +237,4 @@ export function PortfolioPage() {
     </div>
   );
 }
+

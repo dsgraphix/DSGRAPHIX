@@ -105,8 +105,8 @@ export function Header() {
             size="lg"
             className="hidden md:inline-flex whitespace-nowrap px-6"
           >
-            <Link to="/quote">
-              Get a Quote
+            <Link to="/quote" className="inline-flex flex-row items-center justify-center gap-2.5 whitespace-nowrap">
+              <span>Get a Quote</span>
             </Link>
           </Button>
 
@@ -114,7 +114,7 @@ export function Header() {
             onClick={() => setMobileMenuOpen((prev) => !prev)}
             aria-expanded={mobileMenuOpen}
             aria-label="Toggle navigation menu"
-            className="lg:hidden flex h-10 w-10 items-center justify-center brutalist-border bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29] transition-colors"
+            className="lg:hidden flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center brutalist-border bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29] transition-colors cursor-pointer"
           >
             {mobileMenuOpen ? (
               <X className="h-5 w-5" />
