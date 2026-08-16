@@ -1,4 +1,5 @@
 import * as projectService from '../services/projectService.js';
+import { deleteCloudinaryImage } from '../services/cloudinaryService.js';
 
 // Helper for validating project fields
 function validateProjectInput(data, isUpdate = false) {
@@ -142,14 +143,18 @@ export async function updateProject(req, res) {
     const { id } = req.params;
     const input = { ...req.body };
 
-    // If an image file was uploaded
-    if (req.file) {
-      input.image = req.file.path; // Cloudinary returns permanent HTTPS URL in req.file.path
-    }
-
     const existing = await projectService.getProjectById(id);
     if (!existing || existing.status === 'deleted') {
       return res.status(404).json({ error: 'Project not found' });
+    }
+
+    // If a new image file was uploaded
+    if (req.file) {
+      input.image = req.file.path; // Cloudinary returns permanent HTTPS URL in req.file.path
+      // Clean up previous image from Cloudinary if replacing
+      if (existing.image && existing.image !== input.image) {
+        await deleteCloudinaryImage(existing.image);
+      }
     }
 
     const { isValid, errors } = validateProjectInput(input, true);
@@ -179,6 +184,11 @@ export async function deleteProject(req, res) {
     }
 
     const deleted = await projectService.softDeleteProject(id);
+    // Clean up associated image from Cloudinary
+    if (existing.image) {
+      await deleteCloudinaryImage(existing.image);
+    }
+
     return res.status(200).json({
       success: true,
       message: 'Project archived/deleted successfully',

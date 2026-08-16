@@ -14,9 +14,23 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Security & Middleware
+// Security & Middleware — Locked CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:3000',
+  ...(config.allowedOrigin ? [config.allowedOrigin.replace(/\/$/, '')] : [])
+];
+
 app.use(cors({
-  origin: true, // Allow frontend origin
+  origin: (origin, callback) => {
+    // Allow non-browser requests (Postman, curl, server-to-server) or matching allowed origins
+    if (!origin || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:'))) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    }
+  },
   credentials: true
 }));
 app.use(cookieParser());
