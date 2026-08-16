@@ -229,8 +229,13 @@ export function AdminProjectFormPage() {
                     value={formData.slug}
                     onChange={handleChange}
                     placeholder="fintech-app-redesign"
-                    className="w-full bg-[#1F1F1E] border-2 border-white px-4 py-3 text-sm font-mono text-white placeholder-white/40 focus:outline-none focus:border-[#FF6636]"
+                    className={`w-full bg-[#1F1F1E] border-2 px-4 py-3 text-sm font-mono text-white placeholder-white/40 focus:outline-none transition-colors ${
+                      validationErrors.slug ? 'border-red-500' : 'border-white focus:border-[#FF6636]'
+                    }`}
                   />
+                  {validationErrors.slug && (
+                    <p className="text-xs text-red-400 mt-1 font-mono">{validationErrors.slug}</p>
+                  )}
                 </div>
               </div>
 

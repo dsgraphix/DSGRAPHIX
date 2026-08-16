@@ -9,6 +9,35 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
+export async function generateUniqueSlug(baseText, excludeId = null) {
+  const baseSlug = slugify(baseText) || 'project';
+  let candidate = baseSlug;
+  let count = 0;
+
+  while (true) {
+    let exists = false;
+    if (!pool) {
+      exists = memoryDb.projects.some(p => p.slug === candidate && (excludeId === null || p.id !== parseInt(excludeId, 10)));
+    } else {
+      let query = 'SELECT id FROM projects WHERE slug = $1';
+      const params = [candidate];
+      if (excludeId !== null) {
+        query += ' AND id != $2';
+        params.push(excludeId);
+      }
+      const res = await pool.query(query, params);
+      exists = res.rows.length > 0;
+    }
+
+    if (!exists) {
+      return candidate;
+    }
+
+    count += 1;
+    candidate = `${baseSlug}-${count}`;
+  }
+}
+
 // Smart order re-indexer: ensures active projects are ordered 1, 2, 3, 4... without gaps or duplicate sequence numbers
 export async function normalizeDisplayOrders() {
   if (!pool) {
@@ -105,7 +134,7 @@ export async function getProjectBySlug(slug) {
 }
 
 export async function createProject(data) {
-  const slug = data.slug ? slugify(data.slug) : slugify(data.title);
+  const slug = await generateUniqueSlug(data.slug || data.title);
   const status = data.status || 'published';
   const display_order = parseInt(data.display_order || data.order || 999, 10);
 
@@ -155,7 +184,7 @@ export async function createProject(data) {
 }
 
 export async function updateProject(id, data) {
-  const slug = data.slug ? slugify(data.slug) : slugify(data.title);
+  const slug = data.slug || data.title ? await generateUniqueSlug(data.slug || data.title, id) : undefined;
   const status = data.status || 'published';
   const display_order = parseInt(data.display_order || data.order || 0, 10);
 

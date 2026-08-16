@@ -122,6 +122,9 @@ export async function createProject(req, res) {
 
     const { isValid, errors } = validateProjectInput(input, false);
     if (!isValid) {
+      if (req.file?.path) {
+        await deleteCloudinaryImage(req.file.path);
+      }
       return res.status(400).json({ error: 'Validation failed', details: errors });
     }
 
@@ -133,7 +136,18 @@ export async function createProject(req, res) {
     });
   } catch (err) {
     console.error('Error creating project:', err);
-    return res.status(500).json({ error: 'Failed to create project' });
+    // If an image was uploaded to Cloudinary during this failed request, clean it up
+    if (req.file?.path) {
+      await deleteCloudinaryImage(req.file.path);
+    }
+    // Handle Postgres duplicate key error gracefully
+    if (err.code === '23505') {
+      return res.status(400).json({
+        error: 'A project with this title or slug already exists',
+        details: { title: 'A project with this title or slug already exists. Please choose a unique title or slug.' }
+      });
+    }
+    return res.status(500).json({ error: err.message || 'Failed to create project' });
   }
 }
 
@@ -145,6 +159,9 @@ export async function updateProject(req, res) {
 
     const existing = await projectService.getProjectById(id);
     if (!existing || existing.status === 'deleted') {
+      if (req.file?.path) {
+        await deleteCloudinaryImage(req.file.path);
+      }
       return res.status(404).json({ error: 'Project not found' });
     }
 
@@ -170,7 +187,13 @@ export async function updateProject(req, res) {
     });
   } catch (err) {
     console.error('Error updating project:', err);
-    return res.status(500).json({ error: 'Failed to update project' });
+    if (err.code === '23505') {
+      return res.status(400).json({
+        error: 'A project with this title or slug already exists',
+        details: { title: 'A project with this title or slug already exists. Please choose a unique title or slug.' }
+      });
+    }
+    return res.status(500).json({ error: err.message || 'Failed to update project' });
   }
 }
 
