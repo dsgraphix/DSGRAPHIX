@@ -15,17 +15,26 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Security & Middleware — Locked CORS configuration
+const configuredOrigins = config.allowedOrigin
+  ? config.allowedOrigin.split(',').map(o => o.trim().replace(/\/$/, '')).filter(Boolean)
+  : [];
+
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
   'http://127.0.0.1:3000',
-  ...(config.allowedOrigin ? [config.allowedOrigin.replace(/\/$/, '')] : [])
+  ...configuredOrigins
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser requests (Postman, curl, server-to-server) or matching allowed origins
-    if (!origin || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:'))) {
+    // Allow non-browser requests (Postman, curl, Vercel reverse-proxy) or matching allowed origins
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost:'))
+    ) {
       callback(null, true);
     } else {
       callback(new Error(`CORS blocked for origin: ${origin}`));
