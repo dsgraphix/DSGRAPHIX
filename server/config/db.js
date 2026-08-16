@@ -84,10 +84,10 @@ let pool = null;
 let memoryDb = null; // Fallback in-memory database if DATABASE_URL is not set yet
 
 if (config.databaseUrl) {
-  const isCloud = config.databaseUrl.includes('neon.tech') || config.databaseUrl.includes('supabase') || config.databaseUrl.includes('sslmode=require');
+  const isCloud = config.databaseUrl.includes('neon.tech') || config.databaseUrl.includes('supabase') || config.databaseUrl.includes('sslmode=require') || config.databaseUrl.includes('amazonaws.com');
   pool = new Pool({
     connectionString: config.databaseUrl,
-    ssl: isCloud ? { rejectUnauthorized: false } : false
+    ssl: isCloud ? { rejectUnauthorized: true } : false
   });
 } else {
   console.log('💡 Note: DATABASE_URL not set in server/.env. Using resilient memory database store for dev testing.');

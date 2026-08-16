@@ -36,8 +36,8 @@ export async function login(req, res) {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: true, // Always secure since we use cross-origin (HTTPS only)
+      sameSite: 'none', // Required for cross-origin cookie support (Vercel → Railway)
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
 

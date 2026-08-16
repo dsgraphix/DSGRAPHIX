@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { DeleteConfirmModal } from '@/components/admin/DeleteConfirmModal';
 import { Button } from '@/components/ui/button';
+import { authFetch } from '@/context/AuthContext';
 import {
   Search,
   Filter,
@@ -34,7 +35,7 @@ export function AdminProjectsPage() {
       if (statusFilter !== 'All') params.append('status', statusFilter);
       if (search) params.append('search', search);
 
-      const res = await fetch(`/api/admin/projects?${params.toString()}`);
+      const res = await authFetch(`/api/admin/projects?${params.toString()}`);
       if (!res.ok) throw new Error('Failed to load projects');
       const data = await res.json();
       setProjects(data.data || []);
@@ -53,7 +54,7 @@ export function AdminProjectsPage() {
     const newStatus = project.status === 'published' ? 'draft' : 'published';
     setUpdatingId(project.id);
     try {
-      const res = await fetch(`/api/admin/projects/${project.id}`, {
+      const res = await authFetch(`/api/admin/projects/${project.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -76,7 +77,7 @@ export function AdminProjectsPage() {
 
     setUpdatingId(project.id);
     try {
-      const res = await fetch(`/api/admin/projects/${project.id}`, {
+      const res = await authFetch(`/api/admin/projects/${project.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ display_order: parsedOrder })
@@ -97,7 +98,7 @@ export function AdminProjectsPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/projects/${deleteTarget.id}`, {
+      const res = await authFetch(`/api/admin/projects/${deleteTarget.id}`, {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Delete failed');

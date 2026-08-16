@@ -78,12 +78,17 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
+  * { border-color: var(--color-border); box-sizing: border-box; }
+  html, body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%; /* Prevent font size inflation on iOS */
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    touch-action: pan-y; /* Allow vertical scroll, prevent unintended horizontal pan */
   }
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);

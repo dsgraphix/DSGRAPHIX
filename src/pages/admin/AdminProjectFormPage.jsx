@@ -5,6 +5,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Save, Upload, Image as ImageIcon, Trash2, Star, Plus, Layers, AlertCircle, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
 import { InstagramCarousel } from '@/components/site/InstagramCarousel';
+import { authFetch } from '@/context/AuthContext';
 
 const MAX_IMAGES_PER_PROJECT = 10;
 
@@ -41,7 +42,7 @@ export function AdminProjectFormPage() {
 
     const fetchProject = async () => {
       try {
-        const res = await fetch(`/api/admin/projects/${id}`);
+        const res = await authFetch(`/api/admin/projects/${id}`);
         if (!res.ok) throw new Error('Project not found');
         const data = await res.json();
         const p = data.data;
@@ -258,7 +259,7 @@ export function AdminProjectFormPage() {
       const url = isEditMode ? `/api/admin/projects/${id}` : '/api/admin/projects';
       const method = isEditMode ? 'PUT' : 'POST';
 
-      const res = await fetch(url, {
+      const res = await authFetch(url, {
         method,
         body: data
       });
