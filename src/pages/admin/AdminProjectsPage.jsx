@@ -270,13 +270,18 @@ export function AdminProjectsPage() {
                     <td className="py-3 px-4">
                       <div className="w-16 h-12 brutalist-border bg-black overflow-hidden relative group/thumb">
                         <img
-                          src={project.image}
+                          src={project.image || (project.images && project.images[0])}
                           alt={project.title}
                           className="w-full h-full object-cover"
                           onError={(e) => {
                             e.target.src = '/assets/fintech_app.png';
                           }}
                         />
+                        {project.images?.length > 1 && (
+                          <span className="absolute bottom-0.5 right-0.5 px-1 bg-black/80 text-white font-mono text-[9px] font-bold">
+                            {project.images.length}
+                          </span>
+                        )}
                       </div>
                     </td>
 

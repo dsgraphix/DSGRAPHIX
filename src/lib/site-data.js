@@ -123,7 +123,8 @@ export const CASE_STUDIES = [
     category: "UI/UX",
     excerpt: "A full product redesign for a payments app serving 400k users, anchored on a new design system and simplified transaction flow.",
     result: "+52% checkout completion",
-    image: workUiux
+    image: workUiux,
+    images: [workUiux, workBrand, workGraphic]
   },
   {
     slug: "saas-identity-system",
@@ -132,7 +133,8 @@ export const CASE_STUDIES = [
     category: "Branding",
     excerpt: "Positioning, logo craft and a modular identity toolkit rolled out across product, web, sales and event collateral in three weeks.",
     result: "40+ touchpoints unified",
-    image: workBrand
+    image: workBrand,
+    images: [workBrand, workUiux, workVideo]
   },
   {
     slug: "d2c-campaign-creatives",
@@ -141,7 +143,8 @@ export const CASE_STUDIES = [
     category: "Graphic",
     excerpt: "A templated creative system delivering 60+ monthly assets while keeping every post recognisably on-brand.",
     result: "3.1x engagement lift",
-    image: workGraphic
+    image: workGraphic,
+    images: [workGraphic, workVideo, workBrand]
   },
   {
     slug: "product-launch-film",
@@ -150,7 +153,8 @@ export const CASE_STUDIES = [
     category: "Video",
     excerpt: "A hero product film plus twelve platform-native reels, shot in one studio block and cut for every channel.",
     result: "72% avg. watch-through",
-    image: workVideo
+    image: workVideo,
+    images: [workVideo, workGraphic, workUiux]
   },
   {
     slug: "marketplace-web-app",
@@ -159,7 +163,8 @@ export const CASE_STUDIES = [
     category: "UI/UX",
     excerpt: "Complex inventory data made legible through a considered hierarchy, dense tables and a calm, accessible palette.",
     result: "-38% support tickets",
-    image: workUiux
+    image: workUiux,
+    images: [workUiux, workBrand, workGraphic]
   },
   {
     slug: "restaurant-rebrand",
@@ -168,7 +173,8 @@ export const CASE_STUDIES = [
     category: "Branding",
     excerpt: "A warm, tactile identity applied to menus, signage, packaging and uniforms without a single inconsistent asset.",
     result: "14 outlets rolled out",
-    image: workBrand
+    image: workBrand,
+    images: [workBrand, workGraphic, workVideo]
   }
 ];
 

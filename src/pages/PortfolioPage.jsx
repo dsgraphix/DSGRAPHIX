@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { X, ArrowRight, CheckCircle2, FolderKanban } from "lucide-react";
+import { X, ArrowRight, CheckCircle2, FolderKanban, Layers } from "lucide-react";
 import { PageHero } from "@/components/site/PageHero";
 import { CTABand } from "@/components/site/CTABand";
 import { Button } from "@/components/ui/button";
+import { InstagramCarousel } from "@/components/site/InstagramCarousel";
 import { CASE_STUDIES as FALLBACK_CASES } from "@/lib/site-data";
 import { useModalScrollLock } from "@/hooks/useModalScrollLock";
 import { initScrollReveals } from "@/lib/motion";
@@ -65,7 +66,7 @@ export function PortfolioPage() {
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`px-6 py-2.5 rounded-none font-display text-xs font-black uppercase tracking-wider transition-all brutalist-border ${
+                  className={`px-6 py-2.5 rounded-none font-display text-xs font-black uppercase tracking-wider transition-all brutalist-border cursor-pointer ${
                     isActive
                       ? "bg-[#FF6636] text-[#2A2A29]"
                       : "bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29]"
@@ -97,52 +98,67 @@ export function PortfolioPage() {
             </div>
           ) : (
             <div data-reveal-grid className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredCases.map((cs) => (
-                <div
-                  key={cs.id || cs.slug}
-                  data-reveal-item
-                  onClick={() => setSelectedCase(cs)}
-                  className="group cursor-pointer brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-300 overflow-hidden flex flex-col justify-between"
-                >
-                  <div>
-                    <div data-reveal-image className="relative aspect-4/3 overflow-hidden border-b-2 border-white">
-                      <img
-                        src={cs.image}
-                        alt={cs.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                        onError={(e) => {
-                          e.target.src = '/assets/fintech_app.png';
-                        }}
-                      />
-                      <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
-                        {cs.category}
+              {filteredCases.map((cs) => {
+                const caseImages = cs.images && cs.images.length > 0 ? cs.images : (cs.image ? [cs.image] : []);
+                const hasMultipleImages = caseImages.length > 1;
+
+                return (
+                  <div
+                    key={cs.id || cs.slug}
+                    data-reveal-item
+                    onClick={() => setSelectedCase(cs)}
+                    className="group cursor-pointer brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-300 overflow-hidden flex flex-col justify-between"
+                  >
+                    <div>
+                      <div data-reveal-image className="relative aspect-4/3 overflow-hidden border-b-2 border-white">
+                        <img
+                          src={cs.image || caseImages[0]}
+                          alt={cs.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                          onError={(e) => {
+                            e.target.src = '/assets/fintech_app.png';
+                          }}
+                        />
+                        <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
+                          {cs.category}
+                        </span>
+
+                        {/* Multi-Image Badge indicator (Instagram-style) */}
+                        {hasMultipleImages && (
+                          <span className="absolute top-4 right-4 px-2 py-1 bg-[#2A2A29]/90 backdrop-blur-md text-white brutalist-border font-mono text-[11px] font-bold flex items-center gap-1">
+                            <Layers className="h-3 w-3 text-[#FF6636]" />
+                            {caseImages.length}
+                          </span>
+                        )}
+                      </div>
+                      <div className="p-6 space-y-3">
+                        <p className="text-xs font-black text-[#FF6636] group-hover:text-[#2A2A29] uppercase tracking-wider">
+                          Client: {cs.client}
+                        </p>
+                        <h3 className="font-display text-2xl font-black uppercase leading-tight">
+                          {cs.title}
+                        </h3>
+                        <p className="text-sm font-bold opacity-80 line-clamp-2">
+                          {cs.excerpt}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-6 pt-0 border-t-2 border-white/20 group-hover:border-[#2A2A29]/20 mt-4 flex items-center justify-between text-xs font-black uppercase tracking-wider">
+                      <span className="text-[#FF6636] group-hover:text-[#2A2A29]">{cs.result}</span>
+                      <span className="group-hover:underline">
+                        {hasMultipleImages ? `View Gallery (${caseImages.length}) →` : 'View Details →'}
                       </span>
                     </div>
-                    <div className="p-6 space-y-3">
-                      <p className="text-xs font-black text-[#FF6636] group-hover:text-[#2A2A29] uppercase tracking-wider">
-                        Client: {cs.client}
-                      </p>
-                      <h3 className="font-display text-2xl font-black uppercase leading-tight">
-                        {cs.title}
-                      </h3>
-                      <p className="text-sm font-bold opacity-80 line-clamp-2">
-                        {cs.excerpt}
-                      </p>
-                    </div>
                   </div>
-                  <div className="p-6 pt-0 border-t-2 border-white/20 group-hover:border-[#2A2A29]/20 mt-4 flex items-center justify-between text-xs font-black uppercase tracking-wider">
-                    <span className="text-[#FF6636] group-hover:text-[#2A2A29]">{cs.result}</span>
-                    <span className="group-hover:underline">View Details →</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
       </section>
 
-      {/* Case Study Detail Dialog Modal */}
+      {/* Case Study Detail Dialog Modal with Instagram-Style Carousel */}
       {selectedCase && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A2A29]/85 backdrop-blur-md animate-in fade-in duration-200">
           <div
@@ -162,20 +178,19 @@ export function PortfolioPage() {
               </div>
               <button
                 onClick={() => setSelectedCase(null)}
-                className="p-1.5 brutalist-border text-white hover:bg-white hover:text-[#2A2A29]"
+                className="p-1.5 brutalist-border text-white hover:bg-white hover:text-[#2A2A29] cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="aspect-16/9 brutalist-border overflow-hidden bg-slate-800">
-              <img
-                src={selectedCase.image}
+            {/* Instagram-Style Image Carousel */}
+            <div className="brutalist-border overflow-hidden bg-black shadow-2xl">
+              <InstagramCarousel
+                images={selectedCase.images && selectedCase.images.length > 0 ? selectedCase.images : [selectedCase.image]}
                 alt={selectedCase.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/assets/fintech_app.png';
-                }}
+                aspectRatio="aspect-16/9"
+                showBadge={true}
               />
             </div>
 
@@ -222,4 +237,3 @@ export function PortfolioPage() {
     </div>
   );
 }
-

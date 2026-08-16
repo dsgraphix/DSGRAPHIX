@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Quote, ArrowUpRight, MessageCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Quote, ArrowUpRight, MessageCircle, Layers } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import heroAbstract from "@/assets/hero-abstract.jpg";
@@ -275,7 +275,7 @@ export function HomePage() {
                 <div>
                   <div className="relative aspect-16/10 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-500">
                     <img
-                      src={cs.image}
+                      src={cs.image || (cs.images && cs.images[0])}
                       alt={cs.title}
                       loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
@@ -283,6 +283,12 @@ export function HomePage() {
                     <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
                       {cs.category}
                     </span>
+                    {cs.images && cs.images.length > 1 && (
+                      <span className="absolute top-4 right-4 px-2 py-1 bg-[#2A2A29]/90 backdrop-blur-md text-white brutalist-border font-mono text-[11px] font-bold flex items-center gap-1">
+                        <Layers className="h-3 w-3 text-[#FF6636]" />
+                        {cs.images.length}
+                      </span>
+                    )}
                   </div>
                   <div className="p-8 space-y-4">
                     <p className="text-xs font-black uppercase tracking-widest text-[#FF6636] group-hover:text-[#2A2A29]">

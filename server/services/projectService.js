@@ -9,6 +9,26 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
+function normalizeProjectRow(row) {
+  if (!row) return null;
+  let images = row.images;
+  if (typeof images === 'string') {
+    try {
+      images = JSON.parse(images);
+    } catch {
+      images = [];
+    }
+  }
+  if (!Array.isArray(images) || images.length === 0) {
+    images = row.image ? [row.image] : [];
+  }
+  return {
+    ...row,
+    image: images[0] || row.image || '',
+    images: images.slice(0, 10)
+  };
+}
+
 export async function generateUniqueSlug(baseText, excludeId = null) {
   const baseSlug = slugify(baseText) || 'project';
   let candidate = baseSlug;
@@ -84,7 +104,7 @@ export async function getAllProjects({ status, category, search } = {}) {
       const q = search.toLowerCase();
       list = list.filter(p => p.title.toLowerCase().includes(q) || p.client.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q));
     }
-    return list.sort((a, b) => a.display_order - b.display_order);
+    return list.map(normalizeProjectRow).sort((a, b) => a.display_order - b.display_order);
   }
 
   let sql = 'SELECT * FROM projects WHERE 1=1';
@@ -112,31 +132,37 @@ export async function getAllProjects({ status, category, search } = {}) {
   sql += ' ORDER BY display_order ASC, created_at DESC';
 
   const res = await pool.query(sql, params);
-  return res.rows;
+  return res.rows.map(normalizeProjectRow);
 }
 
 export async function getProjectById(id) {
   if (!pool) {
     const item = memoryDb.projects.find(p => p.id === parseInt(id, 10));
-    return item || null;
+    return normalizeProjectRow(item);
   }
   const res = await pool.query('SELECT * FROM projects WHERE id = $1', [id]);
-  return res.rows[0] || null;
+  return normalizeProjectRow(res.rows[0]);
 }
 
 export async function getProjectBySlug(slug) {
   if (!pool) {
     const item = memoryDb.projects.find(p => p.slug === slug);
-    return item || null;
+    return normalizeProjectRow(item);
   }
   const res = await pool.query('SELECT * FROM projects WHERE slug = $1 AND status = $2', [slug, 'published']);
-  return res.rows[0] || null;
+  return normalizeProjectRow(res.rows[0]);
 }
 
 export async function createProject(data) {
   const slug = await generateUniqueSlug(data.slug || data.title);
   const status = data.status || 'published';
   const display_order = parseInt(data.display_order || data.order || 999, 10);
+  
+  let images = Array.isArray(data.images) && data.images.length > 0 
+    ? data.images 
+    : (data.image ? [data.image] : []);
+  images = images.slice(0, 10);
+  const primaryImage = images[0] || data.image || '';
 
   let createdProject = null;
 
@@ -149,7 +175,8 @@ export async function createProject(data) {
       client: data.client,
       category: data.category,
       result: data.result || '',
-      image: data.image,
+      image: primaryImage,
+      images,
       excerpt: data.excerpt,
       display_order,
       status,
@@ -159,8 +186,8 @@ export async function createProject(data) {
     memoryDb.projects.push(createdProject);
   } else {
     const sql = `
-      INSERT INTO projects (slug, title, client, category, result, image, excerpt, display_order, status, updated_at)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())
+      INSERT INTO projects (slug, title, client, category, result, image, images, excerpt, display_order, status, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
       RETURNING *;
     `;
     const params = [
@@ -169,7 +196,8 @@ export async function createProject(data) {
       data.client,
       data.category,
       data.result || '',
-      data.image,
+      primaryImage,
+      JSON.stringify(images),
       data.excerpt,
       display_order,
       status
@@ -188,6 +216,15 @@ export async function updateProject(id, data) {
   const status = data.status || 'published';
   const display_order = parseInt(data.display_order || data.order || 0, 10);
 
+  const existing = await getProjectById(id);
+  if (!existing) return null;
+
+  let images = Array.isArray(data.images) 
+    ? data.images 
+    : (data.image ? [data.image] : existing.images);
+  images = images.slice(0, 10);
+  const primaryImage = images[0] || data.image || existing.image;
+
   let updated = null;
 
   if (!pool) {
@@ -195,12 +232,13 @@ export async function updateProject(id, data) {
     if (idx === -1) return null;
     memoryDb.projects[idx] = {
       ...memoryDb.projects[idx],
-      slug,
+      slug: slug || memoryDb.projects[idx].slug,
       title: data.title,
       client: data.client,
       category: data.category,
       result: data.result || '',
-      image: data.image || memoryDb.projects[idx].image,
+      image: primaryImage,
+      images,
       excerpt: data.excerpt,
       display_order,
       status,
@@ -210,17 +248,18 @@ export async function updateProject(id, data) {
   } else {
     const sql = `
       UPDATE projects
-      SET slug = $1, title = $2, client = $3, category = $4, result = $5, image = $6, excerpt = $7, display_order = $8, status = $9, updated_at = NOW()
-      WHERE id = $10
+      SET slug = COALESCE($1, slug), title = $2, client = $3, category = $4, result = $5, image = $6, images = $7, excerpt = $8, display_order = $9, status = $10, updated_at = NOW()
+      WHERE id = $11
       RETURNING *;
     `;
     const params = [
-      slug,
+      slug || null,
       data.title,
       data.client,
       data.category,
       data.result || '',
-      data.image,
+      primaryImage,
+      JSON.stringify(images),
       data.excerpt,
       display_order,
       status,
@@ -251,7 +290,7 @@ export async function softDeleteProject(id) {
     result = res.rows[0] || null;
   }
 
-  // Smart Auto-Reindex remaining projects so 3 becomes 1, 4 becomes 2, etc.
+  // Smart Auto-Reindex remaining projects
   await normalizeDisplayOrders();
   return result;
 }

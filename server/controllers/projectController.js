@@ -30,14 +30,57 @@ function validateProjectInput(data, isUpdate = false) {
     }
   }
 
-  if (!isUpdate && !data.image) {
-    errors.image = 'Project image is required';
+  // Ensure image or images exist
+  const hasImage = data.image || (Array.isArray(data.images) && data.images.length > 0);
+  if (!isUpdate && !hasImage) {
+    errors.image = 'At least one project image is required';
+  }
+
+  if (Array.isArray(data.images) && data.images.length > 10) {
+    errors.images = 'A project can contain a maximum of 10 images';
   }
 
   return {
     isValid: Object.keys(errors).length === 0,
     errors
   };
+}
+
+// Helper to consolidate uploaded files and string image lists
+function processUploadedImages(req) {
+  let images = [];
+
+  // 1. Check if existing images array passed as body
+  if (req.body.images) {
+    try {
+      images = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+      if (!Array.isArray(images)) images = [];
+    } catch {
+      images = [];
+    }
+  } else if (req.body.image) {
+    images = [req.body.image];
+  }
+
+  // 2. Add single file upload if present
+  if (req.file?.path) {
+    images.unshift(req.file.path);
+  }
+
+  // 3. Add multiple files upload if present
+  if (req.files) {
+    const fileList = Array.isArray(req.files)
+      ? req.files
+      : Object.values(req.files).flat();
+    
+    fileList.forEach(f => {
+      if (f.path) images.push(f.path);
+    });
+  }
+
+  // Deduplicate and enforce max 10 images limit
+  images = Array.from(new Set(images.filter(Boolean))).slice(0, 10);
+  return images;
 }
 
 // Public: GET published projects
@@ -114,17 +157,13 @@ export async function getAdminProjectById(req, res) {
 export async function createProject(req, res) {
   try {
     const input = { ...req.body };
+    const images = processUploadedImages(req);
 
-    // If an image file was uploaded via multipart/form-data
-    if (req.file) {
-      input.image = req.file.path; // Cloudinary returns permanent HTTPS URL in req.file.path
-    }
+    input.images = images;
+    input.image = images[0] || input.image || '';
 
     const { isValid, errors } = validateProjectInput(input, false);
     if (!isValid) {
-      if (req.file?.path) {
-        await deleteCloudinaryImage(req.file.path);
-      }
       return res.status(400).json({ error: 'Validation failed', details: errors });
     }
 
@@ -136,11 +175,6 @@ export async function createProject(req, res) {
     });
   } catch (err) {
     console.error('Error creating project:', err);
-    // If an image was uploaded to Cloudinary during this failed request, clean it up
-    if (req.file?.path) {
-      await deleteCloudinaryImage(req.file.path);
-    }
-    // Handle Postgres duplicate key error gracefully
     if (err.code === '23505') {
       return res.status(400).json({
         error: 'A project with this title or slug already exists',
@@ -159,19 +193,16 @@ export async function updateProject(req, res) {
 
     const existing = await projectService.getProjectById(id);
     if (!existing || existing.status === 'deleted') {
-      if (req.file?.path) {
-        await deleteCloudinaryImage(req.file.path);
-      }
       return res.status(404).json({ error: 'Project not found' });
     }
 
-    // If a new image file was uploaded
-    if (req.file) {
-      input.image = req.file.path; // Cloudinary returns permanent HTTPS URL in req.file.path
-      // Clean up previous image from Cloudinary if replacing
-      if (existing.image && existing.image !== input.image) {
-        await deleteCloudinaryImage(existing.image);
-      }
+    const images = processUploadedImages(req);
+    if (images.length > 0) {
+      input.images = images;
+      input.image = images[0];
+    } else if (existing.images?.length > 0) {
+      input.images = existing.images;
+      input.image = existing.images[0];
     }
 
     const { isValid, errors } = validateProjectInput(input, true);
@@ -207,11 +238,6 @@ export async function deleteProject(req, res) {
     }
 
     const deleted = await projectService.softDeleteProject(id);
-    // Clean up associated image from Cloudinary
-    if (existing.image) {
-      await deleteCloudinaryImage(existing.image);
-    }
-
     return res.status(200).json({
       success: true,
       message: 'Project archived/deleted successfully',
@@ -254,7 +280,7 @@ export async function patchProject(req, res) {
   }
 }
 
-// Protected Admin: POST standalone image upload
+// Protected Admin: POST standalone single image upload
 export async function uploadImageFile(req, res) {
   try {
     if (!req.file) {
@@ -269,5 +295,25 @@ export async function uploadImageFile(req, res) {
   } catch (err) {
     console.error('Error uploading image:', err);
     return res.status(500).json({ error: 'Failed to upload image' });
+  }
+}
+
+// Protected Admin: POST standalone multiple images upload (up to 10)
+export async function uploadMultipleImageFiles(req, res) {
+  try {
+    const fileList = Array.isArray(req.files) ? req.files : Object.values(req.files || {}).flat();
+    if (!fileList || fileList.length === 0) {
+      return res.status(400).json({ error: 'No image files uploaded' });
+    }
+
+    const urls = fileList.map(f => f.path).filter(Boolean).slice(0, 10);
+    return res.status(200).json({
+      success: true,
+      message: `${urls.length} images uploaded successfully`,
+      urls
+    });
+  } catch (err) {
+    console.error('Error uploading multiple images:', err);
+    return res.status(500).json({ error: 'Failed to upload images' });
   }
 }

@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, Upload, Image as ImageIcon, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Save, Upload, Image as ImageIcon, Trash2, Star, Plus, Layers, AlertCircle, GripVertical, ChevronLeft, ChevronRight } from 'lucide-react';
+import { InstagramCarousel } from '@/components/site/InstagramCarousel';
+
+const MAX_IMAGES_PER_PROJECT = 10;
 
 export function AdminProjectFormPage() {
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -17,16 +21,19 @@ export function AdminProjectFormPage() {
     category: 'UI/UX',
     result: '',
     excerpt: '',
-    image: '',
     display_order: 0,
     status: 'published'
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
+  // Array of image items: { id: string, url: string, file?: File, isNew?: boolean }
+  const [imageList, setImageList] = useState([]);
   const [loadingProject, setLoadingProject] = useState(isEditMode);
   const [submitting, setSubmitting] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Drag-and-drop state
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
 
   // Fetch project details in Edit mode
   useEffect(() => {
@@ -45,11 +52,25 @@ export function AdminProjectFormPage() {
           category: p.category || 'UI/UX',
           result: p.result || '',
           excerpt: p.excerpt || '',
-          image: p.image || '',
           display_order: p.display_order ?? 0,
           status: p.status || 'published'
         });
-        setImagePreview(p.image || '');
+
+        // Parse existing images (up to 10)
+        let loadedImages = [];
+        if (Array.isArray(p.images) && p.images.length > 0) {
+          loadedImages = p.images.slice(0, MAX_IMAGES_PER_PROJECT);
+        } else if (p.image) {
+          loadedImages = [p.image];
+        }
+
+        setImageList(
+          loadedImages.map((url, idx) => ({
+            id: `existing-${idx}-${Date.now()}`,
+            url,
+            isNew: false
+          }))
+        );
       } catch (err) {
         toast.error('Failed to load project details');
         navigate('/admin/projects');
@@ -69,34 +90,137 @@ export function AdminProjectFormPage() {
     }
   };
 
-  const handleImageFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Handle multiple image selection
+  const handleMultipleFilesChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image size must be under 5MB');
+    const availableSlots = MAX_IMAGES_PER_PROJECT - imageList.length;
+    if (availableSlots <= 0) {
+      toast.error(`Maximum limit of ${MAX_IMAGES_PER_PROJECT} images reached for this project.`);
       return;
     }
 
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    const filesToAdd = files.slice(0, availableSlots);
+    if (files.length > availableSlots) {
+      toast.warning(`Only ${availableSlots} more image(s) added to stay within the ${MAX_IMAGES_PER_PROJECT}-image limit.`);
+    }
+
+    filesToAdd.forEach((file) => {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`Image ${file.name} exceeds 5MB limit`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImageList(prev => {
+          if (prev.length >= MAX_IMAGES_PER_PROJECT) return prev;
+          return [
+            ...prev,
+            {
+              id: `new-${Date.now()}-${Math.random()}`,
+              url: reader.result,
+              file,
+              isNew: true
+            }
+          ];
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    if (validationErrors.image) {
+      setValidationErrors(prev => ({ ...prev, image: null }));
+    }
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = (indexToRemove) => {
+    setImageList(prev => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleMakeCover = (indexToCover) => {
+    if (indexToCover === 0) return;
+    setImageList(prev => {
+      const copy = [...prev];
+      const [item] = copy.splice(indexToCover, 1);
+      copy.unshift(item);
+      return copy;
+    });
+    toast.success('Cover image set to position #1');
+  };
+
+  const handleMoveStep = (fromIndex, toIndex) => {
+    if (toIndex < 0 || toIndex >= imageList.length) return;
+    setImageList(prev => {
+      const copy = [...prev];
+      const [movedItem] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, movedItem);
+      return copy;
+    });
+  };
+
+  // Drag-and-drop Handlers
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, targetIndex) => {
+    e.preventDefault();
+    const sourceIndex = draggedIndex !== null ? draggedIndex : parseInt(e.dataTransfer.getData('text/plain'), 10);
+    
+    if (isNaN(sourceIndex) || sourceIndex === targetIndex || sourceIndex < 0 || sourceIndex >= imageList.length) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    setImageList(prev => {
+      const copy = [...prev];
+      const [movedItem] = copy.splice(sourceIndex, 1);
+      copy.splice(targetIndex, 0, movedItem);
+      return copy;
+    });
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+    toast.success(`Image moved to position #${targetIndex + 1}`);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidationErrors({});
 
-    // Client-side quick check
     const errors = {};
     if (!formData.title.trim()) errors.title = 'Title is required';
     if (!formData.client.trim()) errors.client = 'Client is required';
     if (!formData.excerpt.trim()) errors.excerpt = 'Excerpt is required';
-    if (!isEditMode && !imageFile && !formData.image) {
-      errors.image = 'Image file or path is required';
+    if (imageList.length === 0) {
+      errors.image = 'At least 1 project image is required (up to 10 max)';
     }
 
     if (Object.keys(errors).length > 0) {
@@ -118,11 +242,18 @@ export function AdminProjectFormPage() {
       data.append('display_order', formData.display_order);
       data.append('status', formData.status);
 
-      if (imageFile) {
-        data.append('imageFile', imageFile);
-      } else if (formData.image) {
-        data.append('image', formData.image);
-      }
+      // Separate existing remote URLs and new binary File objects
+      const existingUrls = imageList
+        .filter(img => !img.isNew && typeof img.url === 'string' && !img.url.startsWith('data:'))
+        .map(img => img.url);
+
+      data.append('images', JSON.stringify(existingUrls));
+
+      // Append new files
+      const newFiles = imageList.filter(img => img.isNew && img.file);
+      newFiles.forEach(img => {
+        data.append('imageFiles', img.file);
+      });
 
       const url = isEditMode ? `/api/admin/projects/${id}` : '/api/admin/projects';
       const method = isEditMode ? 'PUT' : 'POST';
@@ -161,6 +292,8 @@ export function AdminProjectFormPage() {
     );
   }
 
+  const previewUrls = imageList.map(img => img.url);
+
   return (
     <div className="min-h-screen bg-[#2A2A29] text-white flex flex-col">
       <AdminHeader />
@@ -194,9 +327,9 @@ export function AdminProjectFormPage() {
 
         {/* Form Container */}
         <form onSubmit={handleSubmit} className="brutalist-border bg-[#2A2A29] p-6 sm:p-8 space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left 2 Cols: Text Data */}
-            <div className="lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left 7 Cols: Text Data */}
+            <div className="lg:col-span-7 space-y-6">
               {/* Title & Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -347,46 +480,74 @@ export function AdminProjectFormPage() {
               </div>
             </div>
 
-            {/* Right 1 Col: Image Upload & Live Preview */}
-            <div className="space-y-6">
-              <label className="block font-display text-xs font-bold uppercase tracking-wider text-white">
-                Project Image <span className="text-[#FF6636]">*</span>
-              </label>
-
-              {/* Live Preview Box */}
-              <div className="brutalist-border bg-black aspect-video relative overflow-hidden flex items-center justify-center group">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = '/assets/fintech_app.png';
-                    }}
-                  />
-                ) : (
-                  <div className="text-center p-6 text-white/40 flex flex-col items-center">
-                    <ImageIcon className="h-10 w-10 mb-2 opacity-50 text-[#FF6636]" />
-                    <p className="font-display text-xs font-bold uppercase">No Image Selected</p>
-                    <p className="text-[11px] mt-1 font-mono text-white/40">JPG, PNG, WEBP up to 5MB</p>
-                  </div>
-                )}
+            {/* Right 5 Cols: Multi-Image Manager & Instagram Carousel Preview */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="flex items-center justify-between border-b-2 border-white/20 pb-3">
+                <div>
+                  <label className="block font-display text-sm font-bold uppercase tracking-wider text-white">
+                    Project Gallery <span className="text-[#FF6636]">*</span>
+                  </label>
+                  <p className="text-[11px] font-mono text-slate-300">
+                    Upload multiple images (Limit: {MAX_IMAGES_PER_PROJECT} images)
+                  </p>
+                </div>
+                <span className={`px-2.5 py-1 text-xs font-mono font-bold brutalist-border ${
+                  imageList.length >= MAX_IMAGES_PER_PROJECT
+                    ? 'bg-[#FF6636] text-[#2A2A29]'
+                    : 'bg-[#1F1F1E] text-white'
+                }`}>
+                  {imageList.length} / {MAX_IMAGES_PER_PROJECT}
+                </span>
               </div>
 
-              {/* File Upload Input */}
+              {/* Instagram-Style Live Preview Carousel */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-display font-bold uppercase text-[#FF6636] flex items-center gap-1.5">
+                    <Layers className="h-3.5 w-3.5" />
+                    Live Instagram Carousel Preview
+                  </span>
+                  {imageList.length > 0 && (
+                    <span className="text-[11px] text-slate-300 font-mono">Image #1 is Cover</span>
+                  )}
+                </div>
+
+                <div className="brutalist-border overflow-hidden bg-black shadow-xl">
+                  {imageList.length > 0 ? (
+                    <InstagramCarousel
+                      images={previewUrls}
+                      aspectRatio="aspect-16/10"
+                      showBadge={true}
+                    />
+                  ) : (
+                    <div className="aspect-16/10 bg-[#1F1F1E] flex flex-col items-center justify-center p-6 text-center text-white/40">
+                      <ImageIcon className="h-12 w-12 mb-2 text-[#FF6636] opacity-40" />
+                      <p className="font-display text-xs font-bold uppercase">No Images Uploaded Yet</p>
+                      <p className="text-[11px] font-mono mt-1 text-white/40">Upload 1 to 10 images below</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Multi-File Upload Drop Zone */}
               <div className="space-y-3">
-                <label className="cursor-pointer block">
+                <label className={`block ${imageList.length >= MAX_IMAGES_PER_PROJECT ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
                   <div className="border-2 border-dashed border-white hover:border-[#FF6636] bg-[#1F1F1E] p-4 text-center transition-colors">
-                    <Upload className="h-5 w-5 text-[#FF6636] mx-auto mb-1" />
-                    <span className="font-display text-xs font-bold uppercase text-white">
-                      {imageFile ? imageFile.name : 'Upload New Image File'}
+                    <Upload className="h-6 w-6 text-[#FF6636] mx-auto mb-1.5" />
+                    <span className="font-display text-xs font-bold uppercase text-white block">
+                      {imageList.length >= MAX_IMAGES_PER_PROJECT
+                        ? `Maximum Limit of ${MAX_IMAGES_PER_PROJECT} Images Reached`
+                        : `Click or Drag to Upload Images (${MAX_IMAGES_PER_PROJECT - imageList.length} slots left)`}
                     </span>
-                    <p className="text-[11px] text-white/50 mt-0.5 font-mono">Click to browse or drag image</p>
+                    <p className="text-[11px] text-white/50 mt-0.5 font-mono">JPG, PNG, WEBP, GIF up to 5MB each</p>
                   </div>
                   <input
+                    ref={fileInputRef}
                     type="file"
+                    multiple
                     accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-                    onChange={handleImageFileChange}
+                    onChange={handleMultipleFilesChange}
+                    disabled={imageList.length >= MAX_IMAGES_PER_PROJECT}
                     className="hidden"
                   />
                 </label>
@@ -395,6 +556,142 @@ export function AdminProjectFormPage() {
                   <p className="text-xs text-red-400 font-mono">{validationErrors.image}</p>
                 )}
               </div>
+
+              {/* Image Thumbnails Grid with Drag-and-Drop Reorder & Independent Isolated Scroll */}
+              {imageList.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-display text-xs font-bold uppercase text-slate-300">
+                      Reorder Images ({imageList.length})
+                    </span>
+                    <span className="text-[11px] text-[#FF6636] font-mono">
+                      Drag & Drop to reorder or click Cover
+                    </span>
+                  </div>
+
+                  {/* Isolated Scroll Container with data-lenis-prevent to stop main window scroll */}
+                  <div
+                    data-lenis-prevent="true"
+                    onWheel={(e) => e.stopPropagation()}
+                    className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-80 overflow-y-auto overscroll-contain p-2 brutalist-border bg-[#1F1F1E]"
+                    style={{ overscrollBehavior: 'contain' }}
+                  >
+                    {imageList.map((item, idx) => {
+                      const isDragging = draggedIndex === idx;
+                      const isDragOver = dragOverIndex === idx && draggedIndex !== idx;
+
+                      return (
+                        <div
+                          key={item.id}
+                          draggable={true}
+                          onDragStart={(e) => handleDragStart(e, idx)}
+                          onDragOver={(e) => handleDragOver(e, idx)}
+                          onDragLeave={handleDragLeave}
+                          onDrop={(e) => handleDrop(e, idx)}
+                          onDragEnd={handleDragEnd}
+                          className={`relative group aspect-square brutalist-border overflow-hidden bg-black transition-all cursor-grab active:cursor-grabbing ${
+                            idx === 0 ? 'ring-2 ring-[#FF6636]' : ''
+                          } ${isDragging ? 'opacity-40 scale-95 border-dashed border-[#FF6636]' : ''} ${
+                            isDragOver ? 'scale-105 border-2 border-[#FF6636] ring-4 ring-[#FF6636]/40 shadow-2xl' : ''
+                          }`}
+                        >
+                          <img
+                            src={item.url}
+                            alt={`Thumbnail ${idx + 1}`}
+                            className="w-full h-full object-cover pointer-events-none"
+                            onError={(e) => {
+                              e.target.src = '/assets/fintech_app.png';
+                            }}
+                          />
+
+                          {/* Badges */}
+                          <div className="absolute top-1 left-1 z-10 flex items-center gap-1">
+                            {idx === 0 ? (
+                              <span className="px-1.5 py-0.5 bg-[#FF6636] text-[#2A2A29] font-mono text-[9px] font-black uppercase shadow">
+                                Cover
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 bg-[#2A2A29]/90 text-white font-mono text-[9px] font-bold">
+                                #{idx + 1}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Drag Handle Icon Indicator */}
+                          <div className="absolute top-1 right-1 z-10 p-1 bg-black/60 rounded text-white/80 group-hover:text-white">
+                            <GripVertical className="h-3 w-3" />
+                          </div>
+
+                          {/* Hover Overlay Actions */}
+                          <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-between p-2">
+                            {/* Reorder Left / Right quick arrows */}
+                            <div className="flex items-center justify-between w-full">
+                              <button
+                                type="button"
+                                disabled={idx === 0}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMoveStep(idx, idx - 1);
+                                }}
+                                title="Move Left"
+                                className={`p-1 bg-[#2A2A29] text-white hover:bg-[#FF6636] hover:text-[#2A2A29] transition-colors cursor-pointer ${
+                                  idx === 0 ? 'opacity-20 cursor-not-allowed' : ''
+                                }`}
+                              >
+                                <ChevronLeft className="h-3 w-3" />
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled={idx === imageList.length - 1}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMoveStep(idx, idx + 1);
+                                }}
+                                title="Move Right"
+                                className={`p-1 bg-[#2A2A29] text-white hover:bg-[#FF6636] hover:text-[#2A2A29] transition-colors cursor-pointer ${
+                                  idx === imageList.length - 1 ? 'opacity-20 cursor-not-allowed' : ''
+                                }`}
+                              >
+                                <ChevronRight className="h-3 w-3" />
+                              </button>
+                            </div>
+
+                            {/* Middle / Bottom Action Buttons */}
+                            <div className="flex items-center gap-2">
+                              {idx !== 0 && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMakeCover(idx);
+                                  }}
+                                  title="Make Primary Cover"
+                                  className="p-1.5 bg-[#FF6636] text-[#2A2A29] hover:bg-white transition-colors cursor-pointer text-[10px] font-bold uppercase flex items-center gap-1"
+                                >
+                                  <Star className="h-3.5 w-3.5 fill-current" />
+                                  Cover
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveImage(idx);
+                                }}
+                                title="Delete image"
+                                className="p-1.5 bg-red-600 text-white hover:bg-red-700 transition-colors cursor-pointer"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -432,4 +729,3 @@ export function AdminProjectFormPage() {
     </div>
   );
 }
-
