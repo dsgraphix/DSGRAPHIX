@@ -1,26 +1,19 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from '../services/cloudinaryService.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Ensure public/uploads directory exists
-const uploadsDir = path.resolve(__dirname, '../../public/uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
+// Cloudinary storage — files go directly to cloud, never touch local disk
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'dsgraphix/projects',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'],
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }],
+    public_id: (req, file) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      return `project-${uniqueSuffix}`;
+    },
   },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `project-${uniqueSuffix}${ext}`);
-  }
 });
 
 const fileFilter = (req, file, cb) => {
@@ -35,5 +28,5 @@ const fileFilter = (req, file, cb) => {
 export const uploadImage = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter
+  fileFilter,
 });

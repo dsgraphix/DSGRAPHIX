@@ -23,8 +23,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static assets and uploads
-app.use('/uploads', express.static(path.resolve(__dirname, '../public/uploads')));
+// Serve static public assets
 app.use(express.static(path.resolve(__dirname, '../public')));
 
 // Health Check Endpoint

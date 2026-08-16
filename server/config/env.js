@@ -17,6 +17,9 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || '',
   adminEmail: process.env.ADMIN_EMAIL || 'admin@dsgraphix.in',
   adminPassword: process.env.ADMIN_PASSWORD || '',
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
 };
 
 // Critical env var validation — crash fast in production if secrets are missing

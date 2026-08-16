@@ -116,7 +116,7 @@ export async function createProject(req, res) {
 
     // If an image file was uploaded via multipart/form-data
     if (req.file) {
-      input.image = `/uploads/${req.file.filename}`;
+      input.image = req.file.path; // Cloudinary returns permanent HTTPS URL in req.file.path
     }
 
     const { isValid, errors } = validateProjectInput(input, false);
@@ -144,7 +144,7 @@ export async function updateProject(req, res) {
 
     // If an image file was uploaded
     if (req.file) {
-      input.image = `/uploads/${req.file.filename}`;
+      input.image = req.file.path; // Cloudinary returns permanent HTTPS URL in req.file.path
     }
 
     const existing = await projectService.getProjectById(id);
@@ -227,10 +227,10 @@ export async function uploadImageFile(req, res) {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file uploaded' });
     }
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path; // Cloudinary permanent HTTPS URL
     return res.status(200).json({
       success: true,
-      message: 'Image uploaded successfully',
+      message: 'Image uploaded successfully to Cloudinary',
       url: imageUrl
     });
   } catch (err) {
