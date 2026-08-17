@@ -85,8 +85,10 @@ let memoryDb = null; // Fallback in-memory database if DATABASE_URL is not set y
 
 if (config.databaseUrl) {
   const isCloud = config.databaseUrl.includes('neon.tech') || config.databaseUrl.includes('supabase') || config.databaseUrl.includes('sslmode=') || config.databaseUrl.includes('amazonaws.com');
+  // Strip sslmode from the URL so pg driver doesn't conflict with the ssl option object below
+  const cleanDbUrl = config.databaseUrl.replace(/[?&]sslmode=[^&]*/g, (m) => m.startsWith('?') ? '?' : '');
   pool = new Pool({
-    connectionString: config.databaseUrl,
+    connectionString: cleanDbUrl,
     ssl: isCloud ? { rejectUnauthorized: false } : false,
     max: 5,                         // keep Railway container memory low
     idleTimeoutMillis: 30_000,      // release idle clients after 30s (Neon drops them at ~300s)

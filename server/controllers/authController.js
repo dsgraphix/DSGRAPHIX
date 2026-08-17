@@ -48,9 +48,14 @@ export async function login(req, res) {
       token
     });
   } catch (err) {
-    console.error('Login error:', err.message);
-    console.error(err.stack); // full stack trace visible in Railway log viewer
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('❌ LOGIN ERROR:', err.message);
+    console.error('❌ LOGIN STACK:', err.stack);
+    console.error('❌ LOGIN ERROR CODE:', err.code);
+    return res.status(500).json({
+      error: 'Internal server error',
+      // Expose detail in non-production to help diagnose Railway issues
+      detail: process.env.NODE_ENV !== 'production' ? err.message : undefined
+    });
   }
 }
 
