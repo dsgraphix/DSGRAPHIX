@@ -23,6 +23,9 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5000',
   'http://127.0.0.1:3000',
+  // Production domains — hardcoded as a safety net in case ALLOWED_ORIGIN env var is missing from Railway
+  'https://dsgraphix.in',
+  'https://www.dsgraphix.in',
   ...configuredOrigins
 ];
 
