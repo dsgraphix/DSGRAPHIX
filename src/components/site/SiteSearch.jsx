@@ -4,7 +4,7 @@ import { Search, X, FileText, Layout } from "lucide-react";
 import { NAV, SERVICES } from "@/lib/site-data";
 import { useModalScrollLock } from "@/hooks/useModalScrollLock";
 
-export function SiteSearch({ variant = "icon" }) {
+export function SiteSearch({ variant = "icon", onSelectCallback }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
@@ -42,6 +42,9 @@ export function SiteSearch({ variant = "icon" }) {
   );
 
   const handleSelect = (to) => {
+    if (onSelectCallback) {
+      onSelectCallback();
+    }
     navigate(to);
     setOpen(false);
     setQuery("");
