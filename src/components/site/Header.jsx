@@ -11,6 +11,7 @@ import { useModalScrollLock } from "@/hooks/useModalScrollLock";
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const location = useLocation();
 
@@ -25,9 +26,12 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
+  // Close mobile menu on route change & auto-expand services if currently on a services page
   useEffect(() => {
     setMobileMenuOpen(false);
+    if (location.pathname.startsWith("/services")) {
+      setMobileServicesOpen(true);
+    }
   }, [location.pathname]);
 
   // Close mobile menu on Escape key press
@@ -71,9 +75,70 @@ export function Header() {
             <SiteSearch variant="full" onSelectCallback={() => setMobileMenuOpen(false)} />
           </div>
 
-          {/* Navigation Links */}
+          {/* Unified Navigation Links with Expandable Services Accordion */}
           <nav aria-label="Mobile Primary Navigation" className="flex flex-col divide-y-2 divide-white/10 font-display font-black text-xl uppercase tracking-wider">
             {NAV.map((item) => {
+              if (item.to === "/services") {
+                const isServicesActive = location.pathname.startsWith("/services");
+                return (
+                  <div key={item.to} className="py-1">
+                    <button
+                      type="button"
+                      onClick={() => setMobileServicesOpen((prev) => !prev)}
+                      aria-expanded={mobileServicesOpen}
+                      className={`w-full py-3.5 transition-colors flex items-center justify-between text-left cursor-pointer ${
+                        isServicesActive ? "text-[#FF6636]" : "text-white hover:text-[#FF6636]"
+                      }`}
+                    >
+                      <span className="flex items-center gap-2">
+                        {item.label}
+                        {isServicesActive && <span className="h-2 w-2 rounded-full bg-[#FF6636]" />}
+                      </span>
+                      <ChevronDown
+                        className={`h-5 w-5 text-[#FF6636] transition-transform duration-300 ${
+                          mobileServicesOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Sub-services Accordion Dropdown */}
+                    {mobileServicesOpen && (
+                      <div className="pb-3 pl-3 pr-1 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                        {/* All Services Overview Link */}
+                        <Link
+                          to="/services"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-between py-2.5 px-3 bg-[#FF6636]/10 brutalist-border border-[#FF6636]/40 text-[#FF6636] font-display text-sm font-black uppercase tracking-wider hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all"
+                        >
+                          <span>All Services Overview</span>
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+
+                        {/* Individual Services */}
+                        {SERVICES.map((service) => {
+                          const isCurrent = location.pathname === service.to;
+                          return (
+                            <Link
+                              key={service.slug}
+                              to={service.to}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className={`flex items-center justify-between py-2.5 px-3 font-display text-sm font-bold uppercase tracking-wider transition-all border-l-2 ${
+                                isCurrent
+                                  ? "border-[#FF6636] bg-white/10 text-[#FF6636]"
+                                  : "border-white/20 text-slate-300 hover:border-[#FF6636] hover:text-white hover:bg-white/5"
+                              }`}
+                            >
+                              <span>{service.title}</span>
+                              <ArrowRight className="h-3.5 w-3.5 text-[#FF6636] opacity-70" />
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               const isActive =
                 item.to === "/"
                   ? location.pathname === "/"
@@ -99,28 +164,7 @@ export function Header() {
             })}
           </nav>
 
-          {/* Services Quick Links */}
-          <div className="pt-4 border-t-2 border-white/20">
-            <div className="eyebrow mb-3">
-              <span className="h-px w-6 bg-[#FF6636]" />
-              Our Services
-            </div>
-            <div className="grid grid-cols-1 gap-2 pl-2">
-              {SERVICES.map((service) => (
-                <Link
-                  key={service.slug}
-                  to={service.to}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="font-display text-sm font-bold uppercase text-slate-200 hover:text-[#FF6636] flex items-center justify-between py-2.5 transition-colors border-b border-white/5"
-                >
-                  <span>{service.title}</span>
-                  <ArrowRight className="h-4 w-4 text-[#FF6636]" />
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Action CTAs */}
+          {/* Bottom Actions: Quote CTA & WhatsApp */}
           <div className="pt-4 space-y-3">
             <Button asChild variant="brand" size="xl" className="w-full">
               <Link to="/quote" onClick={() => setMobileMenuOpen(false)}>
