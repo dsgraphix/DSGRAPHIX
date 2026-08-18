@@ -35,23 +35,23 @@ export function ProcessPage() {
       {/* Vertical Timeline */}
       <section className="bg-[#2A2A29] section-y border-b-2 border-white">
         <div className="container-page max-w-4xl">
-          <div className="relative pl-6 sm:pl-10 space-y-12 border-l-4 border-[#FF6636]">
+          <div className="relative pl-8 sm:pl-12 space-y-10 sm:space-y-12 border-l-4 border-[#FF6636]">
             {PROCESS.map((p) => (
               <div key={p.step} className="relative group">
-                <div className="absolute -left-[35px] sm:-left-[51px] top-1.5 h-8 w-8 bg-[#FF6636] text-[#2A2A29] brutalist-border flex items-center justify-center font-display text-xs font-black">
+                <div className="absolute -left-[41px] sm:-left-[55px] top-1.5 h-8 w-8 bg-[#FF6636] text-[#2A2A29] brutalist-border flex items-center justify-center font-display text-xs font-black">
                   {p.step}
                 </div>
 
-                <div className="brutalist-border bg-[#2A2A29] p-6 sm:p-8 space-y-4 hover:bg-white hover:text-[#2A2A29] transition-all duration-300 group">
+                <div className="brutalist-border bg-[#2A2A29] p-5 sm:p-8 space-y-3 sm:space-y-4 hover:bg-white hover:text-[#2A2A29] transition-all duration-300 group">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-display text-2xl font-black uppercase">
+                    <h3 className="font-display text-xl sm:text-2xl font-black uppercase">
                       {p.title}
                     </h3>
-                    <span className="font-display text-xs font-black uppercase tracking-widest text-[#FF6636] group-hover:text-[#2A2A29]">
+                    <span className="font-display text-xs font-black uppercase tracking-widest text-[#FF6636] group-hover:text-[#2A2A29] shrink-0 ml-3">
                       Phase {p.step}
                     </span>
                   </div>
-                  <p className="text-slate-300 group-hover:text-[#2A2A29] text-base font-bold leading-relaxed">
+                  <p className="text-slate-300 group-hover:text-[#2A2A29] text-sm sm:text-base font-bold leading-relaxed">
                     {p.body}
                   </p>
                 </div>

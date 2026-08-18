@@ -99,7 +99,7 @@ export function SiteSearch({ variant = "icon" }) {
               </button>
             </div>
 
-            <div data-lenis-prevent="true" className="max-h-[60vh] overflow-y-auto overscroll-contain p-3 divide-y-2 divide-white/10">
+            <div data-lenis-prevent="true" className="max-h-[60vh] sm:max-h-[65vh] overflow-y-auto overscroll-contain p-3 divide-y-2 divide-white/10">
               {filteredPages.length > 0 && (
                 <div className="py-2">
                   <div className="px-3 py-1 font-display text-xs font-black uppercase text-[#FF6636] tracking-widest">
@@ -150,7 +150,7 @@ export function SiteSearch({ variant = "icon" }) {
 
             <div className="border-t-2 border-white px-4 py-3 bg-[#2A2A29] flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
               <span>Press <kbd className="px-1.5 py-0.5 bg-white text-[#2A2A29] font-mono">ESC</kbd> to close</span>
-              <span>DS-Graphix Site Search</span>
+              <span className="hidden sm:inline">DS-Graphix Site Search</span>
             </div>
           </div>
         </div>

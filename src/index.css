@@ -106,11 +106,38 @@
   margin-inline: auto;
   max-width: 80rem;
   padding-inline: 1.25rem;
+  overflow-x: clip; /* prevent horizontal overflow from child elements */
+}
+@media (min-width: 640px) {
+  .container-page {
+    padding-inline: 1.5rem;
+  }
 }
 @media (min-width: 1024px) {
   .container-page {
     padding-inline: 2.5rem;
+    overflow-x: visible; /* restore for desktop dropdowns */
   }
+}
+
+/* Safe-area insets for notched/punch-hole phones */
+@supports (padding: env(safe-area-inset-left)) {
+  .container-page {
+    padding-left: max(1.25rem, env(safe-area-inset-left));
+    padding-right: max(1.25rem, env(safe-area-inset-right));
+  }
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-left: max(2.5rem, env(safe-area-inset-left));
+      padding-right: max(2.5rem, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* Minimum touch target size (WCAG 2.5.5) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .section-y {

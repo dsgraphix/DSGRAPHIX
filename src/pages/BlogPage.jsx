@@ -33,7 +33,7 @@ export function BlogPage() {
             Featured Article
           </span>
 
-          <div className="brutalist-border bg-[#2A2A29] p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8 items-center hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 group">
+          <div className="brutalist-border bg-[#2A2A29] p-6 sm:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6 sm:gap-8 items-center hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-500 group">
             <div className="space-y-4">
               <div className="flex items-center gap-3 text-xs font-black uppercase tracking-wider text-[#FF6636] group-hover:text-[#2A2A29]">
                 <span>{featuredPost.category}</span>

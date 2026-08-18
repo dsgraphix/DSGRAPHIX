@@ -6,22 +6,22 @@ import { whatsappLink } from "@/lib/site-data";
 
 export function CTABand({
   eyebrow = "Start a project",
-  title = <>BUILD YOUR <span className="text-[#FF6636] group-hover:text-[#2A2A29] transition-colors">BREAKTHROUGH.</span></>,
+  title = <>"BUILD YOUR <span className="text-[#FF6636] group-hover:text-[#2A2A29] transition-colors">BREAKTHROUGH.</span></>,
   body = "Tell us about your brand, your timeline and your goals. You'll hear back within 48 hours with a clear scope and a fixed price.",
 }) {
   return (
-    <section className="py-20 lg:py-32 border-t-2 border-white group relative overflow-hidden bg-[#2A2A29] text-white">
+    <section className="py-16 sm:py-20 lg:py-32 border-t-2 border-white group relative overflow-hidden bg-[#2A2A29] text-white">
       <div className="container-page relative z-10">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-12">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8 lg:gap-12">
           {/* Left Column */}
-          <div className="space-y-6 max-w-3xl">
+          <div className="space-y-4 sm:space-y-6 max-w-3xl">
             <div className="text-[#FF6636] group-hover:text-[#2A2A29] transition-colors font-bold uppercase tracking-[0.3em] text-xs sm:text-sm">
               {eyebrow}
             </div>
-            <h2 className="font-display text-4xl sm:text-6xl lg:text-8xl font-black leading-[0.85] tracking-tighter uppercase group-hover:text-[#2A2A29] transition-colors duration-700">
+            <h2 className="font-display text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-black leading-[0.88] tracking-tighter uppercase group-hover:text-[#2A2A29] transition-colors duration-700">
               {title}
             </h2>
-            <p className="text-base lg:text-xl text-[#F2F4F8] font-bold leading-relaxed max-w-xl group-hover:text-[#2A2A29] transition-colors">
+            <p className="text-sm sm:text-base lg:text-xl text-[#F2F4F8] font-bold leading-relaxed max-w-xl group-hover:text-[#2A2A29] transition-colors">
               {body}
             </p>
           </div>

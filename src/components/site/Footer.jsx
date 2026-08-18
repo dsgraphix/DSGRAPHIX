@@ -152,9 +152,9 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-16 pt-8 border-t-2 border-white/20 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold uppercase tracking-wider text-slate-400">
-          <p>© {new Date().getFullYear()} {CONTACT.company}. All rights reserved. Founded by {CONTACT.person}.</p>
-          <div className="flex items-center gap-6">
+        <div className="mt-12 sm:mt-16 pt-8 border-t-2 border-white/20 flex flex-col items-center gap-4 text-xs font-bold uppercase tracking-wider text-slate-400 text-center md:flex-row md:justify-between">
+          <p className="text-center md:text-left">© {new Date().getFullYear()} {CONTACT.company}. All rights reserved. Founded by {CONTACT.person}.</p>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <Link to="/privacy-policy" className="hover:text-[#FF6636] transition-colors">
               Privacy Policy
             </Link>

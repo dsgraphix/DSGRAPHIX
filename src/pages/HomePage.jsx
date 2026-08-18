@@ -67,7 +67,7 @@ export function HomePage() {
   return (
     <div ref={pageRef} className="space-y-0 bg-[#2A2A29] text-white">
       {/* 1. Hero Section */}
-      <section ref={heroContainerRef} className="bg-[#2A2A29] min-h-[85vh] pt-12 pb-20 sm:py-24 px-4 sm:px-6 lg:px-8 flex flex-col justify-center relative overflow-hidden border-b-2 border-white">
+      <section ref={heroContainerRef} className="bg-[#2A2A29] min-h-[85vh] pt-8 pb-16 sm:py-24 px-4 sm:px-6 lg:px-8 flex flex-col justify-center relative overflow-hidden border-b-2 border-white">
         <div className="container-page relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Content */}
@@ -86,7 +86,7 @@ export function HomePage() {
                 </h1>
               </div>
 
-              <p ref={heroLeadRef} className="text-base sm:text-xl text-[#F2F4F8] font-semibold leading-relaxed max-w-xl border-l-4 border-[#FF6636] pl-5">
+              <p ref={heroLeadRef} className="text-sm sm:text-xl text-[#F2F4F8] font-semibold leading-relaxed max-w-xl border-l-4 border-[#FF6636] pl-4 sm:pl-5">
                 We engineer digital products, craft brand identity systems, and produce platform-native content for fast-growing companies worldwide.
               </p>
 
@@ -122,7 +122,7 @@ export function HomePage() {
             </div>
 
             {/* Right Graphic Frame Showcase */}
-            <div ref={heroImageRef} className="lg:col-span-5 relative mt-6 lg:mt-0">
+            <div ref={heroImageRef} className="lg:col-span-5 relative mt-8 lg:mt-0">
               <div className="brutalist-border overflow-hidden bg-[#1E1E1D] p-6 sm:p-8 space-y-6 relative group shadow-2xl">
                 {/* Visual Header Banner with Logo Container */}
                 <div data-reveal-image className="relative aspect-4/3 rounded bg-white p-6 brutalist-border flex flex-col items-center justify-center shadow-inner overflow-hidden">
@@ -371,7 +371,7 @@ export function HomePage() {
                 <span className="block text-xs font-black uppercase tracking-widest text-[#2A2A29]">
                   Case Result // Verified Proof
                 </span>
-                <div className="font-display text-6xl sm:text-8xl font-black text-[#2A2A29] leading-none tracking-tighter">
+                <div className="font-display text-5xl sm:text-7xl lg:text-8xl font-black text-[#2A2A29] leading-none tracking-tighter">
                   +52% LIFT
                 </div>
                 <p className="text-lg sm:text-2xl font-black text-[#2A2A29] leading-snug">

@@ -42,25 +42,25 @@ export function FaqPage() {
       <section className="bg-[#2A2A29] section-y border-b-2 border-white">
         <div className="container-page">
           <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-12 items-start">
-            {/* Accordion List */}
-            <div className="divide-y-2 divide-white/20 border-y-2 border-white">
+            {/* Accordion List - second on mobile, first on desktop */}
+            <div className="divide-y-2 divide-white/20 border-y-2 border-white order-2 lg:order-1">
               {FAQS.map((faq, idx) => {
                 const isOpen = openIdx === idx;
                 return (
-                  <div key={idx} className="py-2">
+                  <div key={idx} className="py-1">
                     <button
                       onClick={() => toggleFaq(idx)}
-                      className="w-full py-6 flex items-center justify-between text-left font-display text-xl lg:text-2xl font-black uppercase text-white hover:text-[#FF6636] transition-colors group"
+                      className="w-full py-5 flex items-center justify-between text-left font-display text-base sm:text-xl lg:text-2xl font-black uppercase text-white hover:text-[#FF6636] transition-colors group"
                     >
                       <span className="pr-4">{faq.question}</span>
                       <ChevronDown
-                        className={`h-6 w-6 text-[#FF6636] shrink-0 transition-transform duration-300 ${
+                        className={`h-5 w-5 sm:h-6 sm:w-6 text-[#FF6636] shrink-0 transition-transform duration-300 ${
                           isOpen ? "rotate-180" : ""
                         }`}
                       />
                     </button>
                     {isOpen && (
-                      <div className="pb-6 text-slate-300 font-bold text-base lg:text-lg leading-relaxed animate-in fade-in duration-200">
+                      <div className="pb-5 text-slate-300 font-bold text-sm sm:text-base lg:text-lg leading-relaxed animate-in fade-in duration-200">
                         {faq.answer}
                       </div>
                     )}
@@ -69,12 +69,12 @@ export function FaqPage() {
               })}
             </div>
 
-            {/* Sticky Aside Panel */}
-            <div className="sticky top-28 brutalist-border bg-[#2A2A29] p-8 space-y-6">
+            {/* Sticky Aside Panel - first on mobile, second on desktop */}
+            <div className="order-1 lg:order-2 lg:sticky lg:top-28 brutalist-border bg-[#2A2A29] p-6 sm:p-8 space-y-6">
               <span className="text-[#FF6636] font-bold uppercase tracking-[0.3em] text-xs sm:text-sm">
                 Still Unsure?
               </span>
-              <h3 className="font-display text-2xl font-black uppercase text-white">
+              <h3 className="font-display text-xl sm:text-2xl font-black uppercase text-white">
                 HAVE A SPECIFIC QUESTION ABOUT YOUR PROJECT?
               </h3>
               <p className="text-sm font-bold text-slate-300 leading-relaxed">

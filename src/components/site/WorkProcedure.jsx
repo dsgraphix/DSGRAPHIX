@@ -58,8 +58,8 @@ export function WorkProcedure() {
   ];
 
   return (
-    <section className="bg-[#2A2A29] text-white py-20 px-4 sm:px-6 lg:px-8 border-b-2 border-white">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <section className="bg-[#2A2A29] text-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8 border-b-2 border-white">
+      <div className="max-w-6xl mx-auto space-y-10 sm:space-y-12">
         {/* Header Title */}
         <div className="space-y-3">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#FF6636]">
@@ -71,14 +71,14 @@ export function WorkProcedure() {
         </div>
 
         {/* 3 Top Cards Grid - Middle box is default orange with white hover */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           {topCards.map((card, idx) => {
             const IconComponent = card.icon;
             const isMiddle = idx === 1;
             return (
               <div
                 key={idx}
-                className={`p-8 brutalist-border transition-all duration-300 group cursor-pointer ${
+                className={`p-6 sm:p-8 brutalist-border transition-all duration-300 group cursor-pointer ${
                   isMiddle
                     ? "bg-[#FF6636] text-[#2A2A29] hover:bg-white hover:text-[#2A2A29]"
                     : "bg-[#2A2A29] text-white hover:bg-white hover:text-[#2A2A29]"

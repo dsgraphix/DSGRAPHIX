@@ -69,7 +69,7 @@ export function AboutPage() {
       {/* Founder Note */}
       <section className="bg-[#2A2A29] section-y border-b-2 border-white">
         <div className="container-page max-w-4xl">
-          <div className="brutalist-border bg-[#2A2A29] p-8 lg:p-14 space-y-6">
+          <div className="brutalist-border bg-[#2A2A29] p-6 sm:p-8 lg:p-14 space-y-6">
             <span className="text-[#FF6636] font-bold uppercase tracking-[0.3em] text-xs sm:text-sm">
               Founder's Note
             </span>
@@ -101,7 +101,7 @@ export function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {values.map((v) => (
-              <div key={v.num} className="brutalist-border bg-[#2A2A29] p-8 sm:p-10 space-y-4 hover:bg-white hover:text-[#2A2A29] transition-all duration-300 group">
+              <div key={v.num} className="brutalist-border bg-[#2A2A29] p-6 sm:p-8 lg:p-10 space-y-4 hover:bg-white hover:text-[#2A2A29] transition-all duration-300 group">
                 <div className="font-display text-2xl font-black text-[#FF6636] group-hover:text-[#2A2A29]">{v.num}</div>
                 <h3 className="font-display text-2xl font-black uppercase">{v.title}</h3>
                 <p className="text-slate-300 group-hover:text-[#2A2A29] font-bold text-sm leading-relaxed">{v.body}</p>

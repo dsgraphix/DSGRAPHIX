@@ -55,7 +55,7 @@ export function ServicesIndexPage() {
                     </div>
 
                     {/* Outcome Stats */}
-                    <div className="pt-6 grid grid-cols-3 gap-4 border-t-2 border-white/20">
+                    <div className="pt-6 grid grid-cols-3 sm:grid-cols-3 gap-3 sm:gap-4 border-t-2 border-white/20">
                       {service.outcomes.map((out, idx) => (
                         <div key={idx}>
                           <div className="font-display text-2xl sm:text-3xl font-black text-[#FF6636]">

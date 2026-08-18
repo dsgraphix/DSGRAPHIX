@@ -35,9 +35,9 @@ export function ServiceDetailPage() {
       />
 
       {/* Hero Image */}
-      <section className="bg-[#2A2A29] py-12 border-b-2 border-white">
+      <section className="bg-[#2A2A29] py-8 sm:py-12 border-b-2 border-white">
         <div className="container-page">
-          <div className="brutalist-border overflow-hidden bg-[#2A2A29] aspect-21/9 max-h-[500px]">
+          <div className="brutalist-border overflow-hidden bg-[#2A2A29] aspect-video sm:aspect-[21/9] max-h-[500px]">
             <img
               src={service.image}
               alt={service.title}
@@ -121,7 +121,7 @@ export function ServiceDetailPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
             {PROCESS.map((p) => (
               <div key={p.step} className="brutalist-border bg-[#2A2A29] p-6 space-y-3 hover:bg-white hover:text-[#2A2A29] transition-colors group">
                 <div className="font-display text-sm font-black text-[#FF6636] group-hover:text-[#2A2A29]">STEP {p.step}</div>
