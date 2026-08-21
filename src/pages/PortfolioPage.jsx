@@ -12,7 +12,18 @@ import { initScrollReveals } from "@/lib/motion";
 export function PortfolioPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedCase, setSelectedCase] = useState(null);
-  const [projects, setProjects] = useState(FALLBACK_CASES);
+  const [projects, setProjects] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem("dsg_cached_projects");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (_) {}
+    return FALLBACK_CASES;
+  });
   const [loading, setLoading] = useState(false);
   const containerRef = useRef(null);
 
@@ -22,11 +33,14 @@ export function PortfolioPage() {
   useEffect(() => {
     async function loadProjects() {
       try {
-        const res = await fetch("/api/projects");
+        const res = await fetch("/api/projects", { cache: "no-store" });
         if (res.ok) {
           const json = await res.json();
-          if (json.data && json.data.length > 0) {
+          if (Array.isArray(json.data) && json.data.length > 0) {
             setProjects(json.data);
+            try {
+              sessionStorage.setItem("dsg_cached_projects", JSON.stringify(json.data));
+            } catch (_) {}
           }
         }
       } catch (err) {

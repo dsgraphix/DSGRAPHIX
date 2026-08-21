@@ -56,6 +56,14 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static public assets
 app.use(express.static(path.resolve(__dirname, '../public')));
 
+// Prevent caching for all API responses so updates/reloads are always fresh
+app.use('/api', (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
 // Root + Health Check — Railway probes these to decide if the container is alive
 // MUST return 200 or Railway will restart the container in a loop
 app.get('/', (req, res) => {

@@ -61,6 +61,7 @@ export function AdminProjectsPage() {
       });
       if (!res.ok) throw new Error('Status update failed');
       
+      try { sessionStorage.removeItem("dsg_cached_projects"); } catch (_) {}
       // Refresh to get normalized display order and fresh data
       await fetchProjects();
       toast.success(`Project "${project.title}" status changed to ${newStatus.toUpperCase()}`);
@@ -84,6 +85,7 @@ export function AdminProjectsPage() {
       });
       if (!res.ok) throw new Error('Reorder failed');
 
+      try { sessionStorage.removeItem("dsg_cached_projects"); } catch (_) {}
       // Refresh to reflect smart normalized sequence 1, 2, 3...
       await fetchProjects();
       toast.success(`Display order updated`);
@@ -103,6 +105,7 @@ export function AdminProjectsPage() {
       });
       if (!res.ok) throw new Error('Delete failed');
 
+      try { sessionStorage.removeItem("dsg_cached_projects"); } catch (_) {}
       toast.success(`Archived project "${deleteTarget.title}". Orders re-indexed automatically!`);
       setDeleteTarget(null);
       await fetchProjects();

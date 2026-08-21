@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Quote, ArrowUpRight, MessageCircle, Layers } from "lucide-react";
+import { ArrowRight, CheckCircle2, Quote, ArrowUpRight, MessageCircle, Layers, X } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import heroAbstract from "@/assets/hero-abstract.jpg";
@@ -11,10 +11,27 @@ import { WorkProcedure } from "@/components/site/WorkProcedure";
 import { SERVICES, CASE_STUDIES as FALLBACK_CASES, PROCESS, STATS, CLIENTS, TESTIMONIALS, whatsappLink } from "@/lib/site-data";
 import { AnimatedCounter } from "@/components/site/AnimatedCounter";
 import { initScrollReveals, initHeroEntrance, isReducedMotion } from "@/lib/motion";
+import { InstagramCarousel } from "@/components/site/InstagramCarousel";
+import { useModalScrollLock } from "@/hooks/useModalScrollLock";
 
 export function HomePage() {
-  const [featuredCases, setFeaturedCases] = useState(FALLBACK_CASES.slice(0, 4));
+  const [featuredCases, setFeaturedCases] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem("dsg_cached_projects");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.slice(0, 4);
+        }
+      }
+    } catch (_) {}
+    return FALLBACK_CASES.slice(0, 4);
+  });
+  const [selectedCase, setSelectedCase] = useState(null);
   const featuredTestimonial = TESTIMONIALS[0];
+
+  // Lock background scroll when case preview modal is open
+  useModalScrollLock(!!selectedCase);
 
   const pageRef = useRef(null);
   const heroContainerRef = useRef(null);
@@ -28,15 +45,18 @@ export function HomePage() {
   useEffect(() => {
     async function loadProjects() {
       try {
-        const res = await fetch("/api/projects");
+        const res = await fetch("/api/projects", { cache: "no-store" });
         if (res.ok) {
           const json = await res.json();
-          if (json.data && json.data.length > 0) {
+          if (Array.isArray(json.data) && json.data.length > 0) {
             setFeaturedCases(json.data.slice(0, 4));
+            try {
+              sessionStorage.setItem("dsg_cached_projects", JSON.stringify(json.data));
+            } catch (_) {}
           }
         }
       } catch (err) {
-        console.warn("API offline, using fallback case studies for homepage.");
+        console.warn("API offline, rendering fallback case studies for homepage.");
       }
     }
     loadProjects();
@@ -267,50 +287,137 @@ export function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {featuredCases.map((cs) => (
-              <div
-                key={cs.slug}
-                className="brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-300 group overflow-hidden flex flex-col justify-between"
-              >
-                <div>
-                  <div className="relative aspect-16/10 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-500">
-                    <img
-                      src={cs.image || (cs.images && cs.images[0])}
-                      alt={cs.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                    />
-                    <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
-                      {cs.category}
-                    </span>
-                    {cs.images && cs.images.length > 1 && (
-                      <span className="absolute top-4 right-4 px-2 py-1 bg-[#2A2A29]/90 backdrop-blur-md text-white brutalist-border font-mono text-[11px] font-bold flex items-center gap-1">
-                        <Layers className="h-3 w-3 text-[#FF6636]" />
-                        {cs.images.length}
+            {featuredCases.map((cs) => {
+              const caseImages = cs.images && cs.images.length > 0 ? cs.images : (cs.image ? [cs.image] : []);
+              const hasMultipleImages = caseImages.length > 1;
+
+              return (
+                <div
+                  key={cs.id || cs.slug}
+                  onClick={() => setSelectedCase(cs)}
+                  className="brutalist-border bg-[#2A2A29] hover:bg-[#FF6636] hover:text-[#2A2A29] transition-all duration-300 group overflow-hidden flex flex-col justify-between cursor-pointer select-none"
+                >
+                  <div>
+                    <div className="relative aspect-16/10 overflow-hidden border-b-2 border-white grayscale group-hover:grayscale-0 transition-all duration-500">
+                      <img
+                        src={cs.image || caseImages[0]}
+                        alt={cs.title}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                        onError={(e) => {
+                          e.target.src = '/assets/fintech_app.png';
+                        }}
+                      />
+                      <span className="absolute top-4 left-4 px-3 py-1 bg-[#2A2A29] text-white brutalist-border font-display text-xs font-black uppercase tracking-wider">
+                        {cs.category}
                       </span>
-                    )}
+                      {hasMultipleImages && (
+                        <span className="absolute top-4 right-4 px-2 py-1 bg-[#2A2A29]/90 backdrop-blur-md text-white brutalist-border font-mono text-[11px] font-bold flex items-center gap-1">
+                          <Layers className="h-3 w-3 text-[#FF6636]" />
+                          {caseImages.length}
+                        </span>
+                      )}
+                    </div>
+                    <div className="p-8 space-y-4">
+                      <p className="text-xs font-black uppercase tracking-widest text-[#FF6636] group-hover:text-[#2A2A29]">
+                        Client: {cs.client}
+                      </p>
+                      <h3 className="font-display text-2xl font-black uppercase leading-snug">
+                        {cs.title}
+                      </h3>
+                      <p className="text-sm font-bold text-slate-300 group-hover:text-[#2A2A29] line-clamp-2">
+                        {cs.excerpt}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-8 space-y-4">
-                    <p className="text-xs font-black uppercase tracking-widest text-[#FF6636] group-hover:text-[#2A2A29]">
-                      Client: {cs.client}
-                    </p>
-                    <h3 className="font-display text-2xl font-black uppercase leading-snug">
-                      {cs.title}
-                    </h3>
-                    <p className="text-sm font-bold text-slate-300 group-hover:text-[#2A2A29] line-clamp-2">
-                      {cs.excerpt}
-                    </p>
+                  <div className="p-8 pt-0 flex items-center justify-between text-xs font-black uppercase tracking-wider">
+                    <span className="text-[#FF6636] group-hover:text-[#2A2A29] font-display text-sm">{cs.result}</span>
+                    <span className="inline-flex items-center gap-1 group-hover:underline">
+                      {hasMultipleImages ? `View Gallery (${caseImages.length})` : 'View Details'} <ArrowUpRight className="h-4 w-4" />
+                    </span>
                   </div>
                 </div>
-                <div className="p-8 pt-0 flex items-center justify-between text-xs font-black uppercase tracking-wider">
-                  <span className="text-[#FF6636] group-hover:text-[#2A2A29] font-display text-sm">{cs.result}</span>
-                  <span className="inline-flex items-center gap-1 group-hover:underline">View Project <ArrowUpRight className="h-4 w-4" /></span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
+
+      {/* Case Study Detail Dialog Modal with Instagram-Style Carousel */}
+      {selectedCase && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A2A29]/85 backdrop-blur-md animate-in fade-in duration-200">
+          <div
+            className="fixed inset-0"
+            onClick={() => setSelectedCase(null)}
+            aria-hidden="true"
+          />
+          <div data-lenis-prevent="true" className="relative w-full max-w-3xl max-h-[90vh] bg-[#2A2A29] text-white brutalist-border overflow-y-auto overscroll-contain z-10 p-6 lg:p-10 space-y-6">
+            <div className="flex items-center justify-between border-b-2 border-white pb-4">
+              <div>
+                <span className="px-3 py-1 bg-[#FF6636] text-[#2A2A29] font-display text-xs font-black uppercase tracking-wider">
+                  {selectedCase.category}
+                </span>
+                <span className="ml-4 text-xs font-black text-slate-300 uppercase tracking-wider">
+                  Client: {selectedCase.client}
+                </span>
+              </div>
+              <button
+                onClick={() => setSelectedCase(null)}
+                className="p-1.5 brutalist-border text-white hover:bg-white hover:text-[#2A2A29] cursor-pointer"
+                title="Close modal"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Instagram-Style Image Carousel */}
+            <div className="brutalist-border overflow-hidden bg-black shadow-2xl">
+              <InstagramCarousel
+                images={selectedCase.images && selectedCase.images.length > 0 ? selectedCase.images : [selectedCase.image]}
+                alt={selectedCase.title}
+                aspectRatio="aspect-16/9"
+                showBadge={true}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <h2 className="font-display text-3xl lg:text-4xl font-black uppercase tracking-tight">
+                {selectedCase.title}
+              </h2>
+              <p className="text-slate-300 text-base font-bold leading-relaxed">
+                {selectedCase.excerpt}
+              </p>
+
+              {selectedCase.result && (
+                <div className="brutalist-border bg-[#FF6636] text-[#2A2A29] p-5 flex items-center gap-4">
+                  <CheckCircle2 className="h-6 w-6 shrink-0" />
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-wider">Verified Outcome</div>
+                    <div className="font-display text-xl font-black">{selectedCase.result}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-6 border-t-2 border-white flex flex-col sm:flex-row items-center justify-between gap-4">
+              <Button asChild variant="brand" size="xl" className="w-full sm:w-auto">
+                <Link to="/quote" onClick={() => setSelectedCase(null)}>
+                  Start a Similar Project
+                  <ArrowRight className="h-4 w-4 ml-1" />
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setSelectedCase(null)}
+                className="w-full sm:w-auto"
+              >
+                Close Preview
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 6. Deliverables & Proof (Kombai Light Panel Contrast Section) */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#F2F4F8] text-[#2A2A29] border-b-2 border-white">

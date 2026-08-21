@@ -272,6 +272,7 @@ export function AdminProjectFormPage() {
         throw new Error(responseData.error || 'Failed to save project');
       }
 
+      try { sessionStorage.removeItem("dsg_cached_projects"); } catch (_) {}
       toast.success(isEditMode ? 'Project updated successfully!' : 'New project created successfully!');
       navigate('/admin/projects');
     } catch (err) {
