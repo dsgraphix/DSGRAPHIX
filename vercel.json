@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://dsgraphix-production.up.railway.app/api/:path*"
+      "destination": "https://dsgraphix-product.up.railway.app/api/:path*"
     },
     {
       "source": "/(.*)",
